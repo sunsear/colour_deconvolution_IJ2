@@ -23,14 +23,10 @@ public class StainMatrixIJ2Test {
         stainMatrix.init("test stain", 0.66645944, 0.6332006, 0.39355922, 0.25378, 0.737415, 0.6259511, 0, 0, 0);
         ImgPlus[] computed = stainMatrix.compute(false, false, imagePlus);
         assertEquals("We expect there to be 3 result images", 3, computed.length);
-//        assertEquals("We expect each stack to have only 1 slice", 3, computed[0].numDimensions());
         datasetIOService.save(new DefaultDataset(datasetIOService.context(), computed[0]), "src/test/resources/outputConvoluted1.tif");
         datasetIOService.save(new DefaultDataset(datasetIOService.context(), computed[1]), "src/test/resources/outputConvoluted2.tif");
         datasetIOService.save(new DefaultDataset(datasetIOService.context(), computed[2]), "src/test/resources/outputConvoluted3.tif");
 //        Dataset expected1 = datasetIOService.open("src/test/resources/expectedDeconvoluted1.tif");
 //        new ImageCalculator().run("Difference", expected1.getImgPlus(), computed[0]);
-//        assertEquals("Difference at first sample point should be 0", 0, expected1.getPixel(15, 15)[0]);
-//        assertEquals("Difference at first sample point should be 0", 0, expected1.getPixel(1500, 150)[0]);
-//        assertEquals("Difference at first sample point should be 0", 0, expected1.getPixel(150, 1500)[0]);
     }
 }
