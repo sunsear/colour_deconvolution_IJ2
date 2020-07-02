@@ -37,14 +37,11 @@ public class StainMatrixIJ2 extends StainMatrixBase {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int R = randomAccess.get().getByte();
-                R = R < 0 ? R + 256 : R;
+                int R = randomAccess.get().getInteger();
                 randomAccess.fwd(2);
-                int G = randomAccess.get().getByte();
-                G = G < 0 ? G + 256 : G;
+                int G = randomAccess.get().getInteger();
                 randomAccess.fwd(2);
-                int B = randomAccess.get().getByte();
-                B = B < 0 ? B + 256 : B;
+                int B = randomAccess.get().getInteger();
                 randomAccess.move(-2, 2);
 
                 double Rlog = -((255.0 * Math.log(((double) R + 1) / 255.0)) / log255);
@@ -71,7 +68,7 @@ public class StainMatrixIJ2 extends StainMatrixBase {
         outputImages[0] = new ImgPlus<>(ArrayImgs.unsignedBytes(newpixels[0], width, height));
         outputImages[1] = new ImgPlus<>(ArrayImgs.unsignedBytes(newpixels[1], width, height));
         outputImages[2] = new ImgPlus<>(ArrayImgs.unsignedBytes(newpixels[2], width, height));
-//        initializeColorTables(outputImages);
+        initializeColorTables(outputImages);
         return outputImages;
     }
 
