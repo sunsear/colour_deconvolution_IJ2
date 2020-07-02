@@ -1,8 +1,9 @@
 package sc.fiji.colourDeconvolution;
 
-import org.scijava.ItemIO;
+import static org.scijava.ItemIO.INPUT;
+import static org.scijava.ItemIO.OUTPUT;
+
 import org.scijava.command.Command;
-import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -13,39 +14,38 @@ import net.imglib2.type.numeric.integer.UnsignedByteType;
 @Plugin(type = Command.class, headless = true, menuPath = "Histo>Colour Deconvolution")
 public class Colour_DeconvolutionIJ2 implements Command {
 
-    @Parameter(type = ItemIO.INPUT)
+    @Parameter(type = INPUT, label = "Colour 1 Red mean",
+            description = "The mean value for Red pixels in colour 1, should be between 0 and 1", max = "1", min = "0")
     private final Double R1 = 0.66645944;
-    @Parameter(type = ItemIO.INPUT)
+    @Parameter(type = INPUT, label = "Colour 1 Green mean",
+            description = "The mean value for Green pixels in colour 1, should be between 0 and 1", max = "1", min = "0")
     private final Double G1 = 0.6332006;
-    @Parameter(type = ItemIO.INPUT)
+    @Parameter(type = INPUT, label = "Colour 1 Blue mean",
+            description = "The mean value for Blue pixels in colour 1, should be between 0 and 1", max = "1", min = "0")
     private final Double B1 = 0.39355922;
 
-    @Parameter(type = ItemIO.INPUT)
+    @Parameter(type = INPUT, label = "Colour 2 Red mean",
+            description = "The mean value for Red pixels in colour 2, should be between 0 and 1", max = "1", min = "0")
     private final Double R2 = 0.25378;
-    @Parameter(type = ItemIO.INPUT)
+    @Parameter(type = INPUT, label = "Colour 2 Green mean",
+            description = "The mean value for Green pixels in colour 2, should be between 0 and 1", max = "1", min = "0")
     private final Double G2 = 0.737415;
-    @Parameter(type = ItemIO.INPUT)
+    @Parameter(type = INPUT, label = "Colour 2 Blue mean",
+            description = "The mean value for Blue pixels in colour 2, should be between 0 and 1", max = "1", min = "0")
     private final Double B2 = 0.6259511;
 
-    @Parameter(type = ItemIO.INPUT)
+    @Parameter(type = INPUT)
     private Dataset dataset;
 
-    @Parameter(type = ItemIO.INPUT)
-    private LogService log;
-
-    @Parameter(type = ItemIO.OUTPUT)
+    @Parameter(type = OUTPUT)
     private ImgPlus<UnsignedByteType> deconvolutedImage1;
-    @Parameter(type = ItemIO.OUTPUT)
+    @Parameter(type = OUTPUT)
     private ImgPlus<UnsignedByteType> deconvolutedImage2;
-    @Parameter(type = ItemIO.OUTPUT)
+    @Parameter(type = OUTPUT)
     private ImgPlus<UnsignedByteType> deconvolutedImage3;
 
-//    public static void main(String[] args) {
-//        // Launch ImageJ as usual.
-//        final ImageJ ij = new ImageJ();
-//
-//        ij.launch(args);
-//    }
+    public Colour_DeconvolutionIJ2() {
+    }
 
     /**
      * Produces an output with the well-known "Hello, World!" message. The
