@@ -17,23 +17,23 @@ public class Colour_DeconvolutionIJ2 implements Command {
 
     @Parameter(type = INPUT, label = "Colour 1 Red mean",
             description = "The mean value for Red pixels in colour 1, should be between 0 and 1", max = "1", min = "0")
-    private final Double R1 = 0.66645944;
+    private Double R1 = 0.66645944;
     @Parameter(type = INPUT, label = "Colour 1 Green mean",
             description = "The mean value for Green pixels in colour 1, should be between 0 and 1", max = "1", min = "0")
-    private final Double G1 = 0.6332006;
+    private Double G1 = 0.6332006;
     @Parameter(type = INPUT, label = "Colour 1 Blue mean",
             description = "The mean value for Blue pixels in colour 1, should be between 0 and 1", max = "1", min = "0")
-    private final Double B1 = 0.39355922;
+    private Double B1 = 0.39355922;
 
     @Parameter(type = INPUT, label = "Colour 2 Red mean",
             description = "The mean value for Red pixels in colour 2, should be between 0 and 1", max = "1", min = "0")
-    private final Double R2 = 0.25378;
+    private Double R2 = 0.25378;
     @Parameter(type = INPUT, label = "Colour 2 Green mean",
             description = "The mean value for Green pixels in colour 2, should be between 0 and 1", max = "1", min = "0")
-    private final Double G2 = 0.737415;
+    private Double G2 = 0.737415;
     @Parameter(type = INPUT, label = "Colour 2 Blue mean",
             description = "The mean value for Blue pixels in colour 2, should be between 0 and 1", max = "1", min = "0")
-    private final Double B2 = 0.6259511;
+    private Double B2 = 0.6259511;
 
     @Parameter(type = INPUT, label = "Image to colour deconvolve",
             description = "The image that you would like to apply colour deconvolution on. Should be an RGB image!")
