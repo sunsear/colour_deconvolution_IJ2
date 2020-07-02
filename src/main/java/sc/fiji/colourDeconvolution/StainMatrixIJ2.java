@@ -22,32 +22,34 @@ public class StainMatrixIJ2 extends StainMatrix {
      * @param imp        : The ImagePlus that will be deconvolved. RGB only.
      * @return a Stack array of three 8-bit images
      */
-    public ImgPlus[] compute(boolean doIshow, boolean hideLegend, ImgPlus imp) {
+    public ImgPlus<UnsignedByteType>[] compute(boolean doIshow, boolean hideLegend, ImgPlus<UnsignedByteType> imp) {
         double[] q = initComputation(doIshow, hideLegend);
 
-        Img img = imp.getImg();
+        Img<UnsignedByteType> img = imp.getImg();
 
         int width = (int) img.dimension(0);
         int height = (int) img.dimension(1);
-        ImgPlus[] outputImages = new ImgPlus[3];
         double log255 = Math.log(255.0);
 //        // Translate ------------------
         int imageSize = width * height;
 
-        RandomAccess randomAccess = img.randomAccess();
+        RandomAccess<UnsignedByteType> randomAccess = img.randomAccess();
 
         byte[][] newpixels = new byte[3][];
         newpixels[0] = new byte[imageSize];
         newpixels[1] = new byte[imageSize];
         newpixels[2] = new byte[imageSize];
 
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                byte R = ((UnsignedByteType) randomAccess.get()).getByte();
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int R = randomAccess.get().getByte();
+                R = R < 0 ? R + 256 : R;
                 randomAccess.fwd(2);
-                byte G = ((UnsignedByteType) randomAccess.get()).getByte();
+                int G = randomAccess.get().getByte();
+                G = G < 0 ? G + 256 : G;
                 randomAccess.fwd(2);
-                byte B = ((UnsignedByteType) randomAccess.get()).getByte();
+                int B = randomAccess.get().getByte();
+                B = B < 0 ? B + 256 : B;
                 randomAccess.move(-2, 2);
 
                 double Rlog = -((255.0 * Math.log(((double) R + 1) / 255.0)) / log255);
@@ -63,19 +65,22 @@ public class StainMatrixIJ2 extends StainMatrix {
                     if (output > 255) output = 255;
                     newpixels[channel][width * y + x] = (byte) (0xff & (int) (Math.floor(output + .5)));
                 }
-                randomAccess.fwd(1);
+                randomAccess.fwd(0);
             }
-            randomAccess.move(-height, 1);
-            randomAccess.fwd(0);
+            randomAccess.move(-width, 0);
+            randomAccess.fwd(1);
         }
-        outputImages[0] = new ImgPlus(ArrayImgs.unsignedBytes(newpixels[0], width, height));
-        outputImages[1] = new ImgPlus(ArrayImgs.unsignedBytes(newpixels[1], width, height));
-        outputImages[2] = new ImgPlus(ArrayImgs.unsignedBytes(newpixels[2], width, height));
+
+        @SuppressWarnings("unchecked")
+        ImgPlus<UnsignedByteType>[] outputImages = new ImgPlus[3];
+        outputImages[0] = new ImgPlus<>(ArrayImgs.unsignedBytes(newpixels[0], width, height));
+        outputImages[1] = new ImgPlus<>(ArrayImgs.unsignedBytes(newpixels[1], width, height));
+        outputImages[2] = new ImgPlus<>(ArrayImgs.unsignedBytes(newpixels[2], width, height));
         initializeColorTables(outputImages);
         return outputImages;
     }
 
-    private ImgPlus[] initializeColorTables(ImgPlus[] outputImages) {
+    private ImgPlus<UnsignedByteType>[] initializeColorTables(ImgPlus<UnsignedByteType>[] outputImages) {
         byte[] rLUT = new byte[256];
         byte[] gLUT = new byte[256];
         byte[] bLUT = new byte[256];
