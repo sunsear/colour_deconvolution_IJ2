@@ -1,3 +1,5 @@
+package sc.fiji.colourDeconvolution;
+
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
@@ -12,7 +14,6 @@ import net.imagej.DefaultDataset;
 import net.imagej.ImageJ;
 import net.imagej.ImgPlus;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
-import sc.fiji.colourDeconvolution.StainMatrixIJ2;
 
 public class StainMatrixIJ2Test {
     @Test

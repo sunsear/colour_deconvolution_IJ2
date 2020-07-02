@@ -1,3 +1,5 @@
+package sc.fiji.colourDeconvolution;
+
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
@@ -6,7 +8,6 @@ import ij.ImagePlus;
 import ij.ImageStack;
 import ij.io.FileSaver;
 import ij.plugin.ImageCalculator;
-import sc.fiji.colourDeconvolution.StainMatrix;
 
 public class StainMatrixTest {
     @Test
