@@ -24,7 +24,7 @@ public class StainMatrixIJ2Test {
         ImgPlus<UnsignedByteType> imagePlus = (ImgPlus<UnsignedByteType>) dataset.getImgPlus();
         StainMatrixIJ2 stainMatrix = new StainMatrixIJ2();
         stainMatrix.init("test stain", 0.66645944, 0.6332006, 0.39355922, 0.25378, 0.737415, 0.6259511, 0, 0, 0);
-        ImgPlus<UnsignedByteType>[] computed = stainMatrix.compute(false, true, imagePlus);
+        ImgPlus<UnsignedByteType>[] computed = stainMatrix.compute(imagePlus);
         assertEquals("We expect there to be 3 result images", 3, computed.length);
         datasetIOService.save(new DefaultDataset(datasetIOService.context(), computed[0]), "target/ij2-outputDeconvoluted1.tif");
         datasetIOService.save(new DefaultDataset(datasetIOService.context(), computed[1]), "target/ij2-outputDeconvoluted2.tif");

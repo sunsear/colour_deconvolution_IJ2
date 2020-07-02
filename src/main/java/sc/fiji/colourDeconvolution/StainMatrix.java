@@ -82,7 +82,14 @@ public class StainMatrix extends StainMatrixBase {
      * @return a Stack array of three 8-bit images
      */
     public ImageStack[] compute(boolean doIshow, boolean hideLegend, ImagePlus imp) {
-        double[] q = initComputation(doIshow, hideLegend);
+        double[] q = initComputation(doIshow);
+
+        if (!hideLegend) {
+            showLegend(myStain);
+        }
+        if (doIshow) {
+            showMatrix(myStain);
+        }
 
         ImageStack stack = imp.getStack();
 
@@ -148,7 +155,6 @@ public class StainMatrix extends StainMatrixBase {
         return outputstack;
     }
 
-    @Override
     protected void showLegend(String myStain) {
 
         ImagePlus imp0 = NewImage.createRGBImage("Colour Deconvolution", 350, 65, 1, 0);
@@ -177,7 +183,6 @@ public class StainMatrix extends StainMatrixBase {
         imp0.updateAndDraw();
     }
 
-    @Override
     protected void showMatrix(String myStain) {
         IJ.log(myStain + " Vector Matrix ---");
         for (int i = 0; i < 3; i++) {

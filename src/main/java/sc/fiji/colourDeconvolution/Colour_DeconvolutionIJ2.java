@@ -6,22 +6,27 @@ import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
-import ij.ImagePlus;
-import ij.ImageStack;
 import net.imagej.Dataset;
 import net.imagej.ImageJ;
-import net.imglib2.img.Img;
-import net.imglib2.img.display.imagej.ImageJFunctions;
-import net.imglib2.type.numeric.integer.ByteType;
+import net.imagej.ImgPlus;
+import net.imglib2.type.numeric.integer.UnsignedByteType;
 
 @Plugin(type = Command.class, headless = true, menuPath = "Histo>Colour Deconvolution")
 public class Colour_DeconvolutionIJ2 implements Command {
 
     @Parameter(type = ItemIO.INPUT)
-    private Double R1 = 0.66645944, G1 = 0.6332006, B1 = 0.39355922;
+    private final Double R1 = 0.66645944;
+    @Parameter(type = ItemIO.INPUT)
+    private final Double G1 = 0.6332006;
+    @Parameter(type = ItemIO.INPUT)
+    private final Double B1 = 0.39355922;
 
     @Parameter(type = ItemIO.INPUT)
-    private Double R2 = 0.25378, G2 = 0.737415, B2 = 0.6259511;
+    private final Double R2 = 0.25378;
+    @Parameter(type = ItemIO.INPUT)
+    private final Double G2 = 0.737415;
+    @Parameter(type = ItemIO.INPUT)
+    private final Double B2 = 0.6259511;
 
     @Parameter(type = ItemIO.INPUT)
     private Dataset dataset;
@@ -30,13 +35,13 @@ public class Colour_DeconvolutionIJ2 implements Command {
     private LogService log;
 
     @Parameter(type = ItemIO.OUTPUT)
-    private Img<ByteType> deconvolutedImage1;
+    private ImgPlus<UnsignedByteType> deconvolutedImage1;
     @Parameter(type = ItemIO.OUTPUT)
-    private Img<ByteType> deconvolutedImage2;
+    private ImgPlus<UnsignedByteType> deconvolutedImage2;
     @Parameter(type = ItemIO.OUTPUT)
-    private Img<ByteType> deconvolutedImage3;
+    private ImgPlus<UnsignedByteType> deconvolutedImage3;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         // Launch ImageJ as usual.
         final ImageJ ij = new ImageJ();
 
@@ -51,14 +56,12 @@ public class Colour_DeconvolutionIJ2 implements Command {
      */
     @Override
     public void run() {
-        StainMatrix sm = new StainMatrix();
+        StainMatrixIJ2 sm = new StainMatrixIJ2();
         sm.init("Our stain", R1, G1, B1, R2, G2, B2, 0, 0, 0);
-        Img<ByteType> img = (Img<ByteType>) dataset.getImgPlus().getImg();
-        ImageStack[] imageStacks = sm.compute(false, true, ImageJFunctions.wrap(img, dataset.getName()));
-        ImagePlus imp = new ImagePlus("Image " + 0, imageStacks[0]);
-        imp.show();
-        deconvolutedImage1 = ImageJFunctions.wrap(imp);
-        deconvolutedImage2 = ImageJFunctions.wrap(new ImagePlus("Image " + 1, imageStacks[1]));
-        deconvolutedImage3 = ImageJFunctions.wrap(new ImagePlus("Image " + 2, imageStacks[2]));
+        @SuppressWarnings("unchecked")
+        ImgPlus<UnsignedByteType>[] imageStacks = sm.compute((ImgPlus<UnsignedByteType>) dataset.getImgPlus());
+        deconvolutedImage1 = imageStacks[0];
+        deconvolutedImage2 = imageStacks[1];
+        deconvolutedImage3 = imageStacks[2];
     }
 }

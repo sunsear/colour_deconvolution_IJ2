@@ -74,7 +74,7 @@ public abstract class StainMatrixBase {
         MODz = mODz;
     }
 
-    protected double[] initComputation(boolean doIshow, boolean hideLegend) {
+    protected double[] initComputation(boolean doIshow) {
         double leng;
 
         normalizeVectorLength();
@@ -91,12 +91,6 @@ public abstract class StainMatrixBase {
             if (cosx[i] == 0.0) cosx[i] = 0.001;
             if (cosy[i] == 0.0) cosy[i] = 0.001;
             if (cosz[i] == 0.0) cosz[i] = 0.001;
-        }
-        if (!hideLegend) {
-            showLegend(myStain);
-        }
-        if (doIshow) {
-            showMatrix(myStain);
         }
 
         return buildInvertMatrix();
@@ -176,8 +170,4 @@ public abstract class StainMatrixBase {
             }
         }
     }
-
-    protected abstract void showLegend(String myStain);
-
-    protected abstract void showMatrix(String myStain);
 }

@@ -8,7 +8,7 @@ import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
-public class StainMatrixIJ2 extends StainMatrix {
+public class StainMatrixIJ2 extends StainMatrixBase {
     private final ImageJ ij = new ImageJ();
 
     /**
@@ -17,13 +17,11 @@ public class StainMatrixIJ2 extends StainMatrix {
      * E) the 3rd image represents the complimentary of the first two colours
      * (i.e. green).
      *
-     * @param doIshow    :    Show or not the matrix in a popup
-     * @param hideLegend : Hide or not the legend in a popup
-     * @param imp        : The ImagePlus that will be deconvolved. RGB only.
+     * @param imp : The ImagePlus that will be deconvolved. RGB only.
      * @return a Stack array of three 8-bit images
      */
-    public ImgPlus<UnsignedByteType>[] compute(boolean doIshow, boolean hideLegend, ImgPlus<UnsignedByteType> imp) {
-        double[] q = initComputation(doIshow, hideLegend);
+    public ImgPlus<UnsignedByteType>[] compute(ImgPlus<UnsignedByteType> imp) {
+        double[] q = initComputation(true);
 
         Img<UnsignedByteType> img = imp.getImg();
 
@@ -76,7 +74,7 @@ public class StainMatrixIJ2 extends StainMatrix {
         outputImages[0] = new ImgPlus<>(ArrayImgs.unsignedBytes(newpixels[0], width, height));
         outputImages[1] = new ImgPlus<>(ArrayImgs.unsignedBytes(newpixels[1], width, height));
         outputImages[2] = new ImgPlus<>(ArrayImgs.unsignedBytes(newpixels[2], width, height));
-        initializeColorTables(outputImages);
+//        initializeColorTables(outputImages);
         return outputImages;
     }
 
