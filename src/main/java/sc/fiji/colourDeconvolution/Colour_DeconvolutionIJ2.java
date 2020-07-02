@@ -34,14 +34,16 @@ public class Colour_DeconvolutionIJ2 implements Command {
             description = "The mean value for Blue pixels in colour 2, should be between 0 and 1", max = "1", min = "0")
     private final Double B2 = 0.6259511;
 
-    @Parameter(type = INPUT)
+    @Parameter(type = INPUT, label = "Image to colour deconvolve",
+            description = "The image that you would like to apply colour deconvolution on.")
     private Dataset dataset;
 
-    @Parameter(type = OUTPUT)
+    @Parameter(type = OUTPUT, label = "Colour 1 deconvolved Image")
     private ImgPlus<UnsignedByteType> deconvolutedImage1;
-    @Parameter(type = OUTPUT)
+    @Parameter(type = OUTPUT, label = "Colour 2 deconvolved Image")
     private ImgPlus<UnsignedByteType> deconvolutedImage2;
-    @Parameter(type = OUTPUT)
+    @Parameter(type = OUTPUT, label = "Remainder",
+            description = "Remainder after the other 2 colours have been subtracted. Should be close to empty")
     private ImgPlus<UnsignedByteType> deconvolutedImage3;
 
     public Colour_DeconvolutionIJ2() {
