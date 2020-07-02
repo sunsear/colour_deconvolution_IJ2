@@ -1,6 +1,5 @@
 package sc.fiji.colourDeconvolution;
 
-import net.imagej.ImageJ;
 import net.imagej.ImgPlus;
 import net.imglib2.RandomAccess;
 import net.imglib2.display.ColorTable8;
@@ -9,8 +8,6 @@ import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
 public class StainMatrixIJ2 extends StainMatrixBase {
-    private final ImageJ ij = new ImageJ();
-
     /**
      * Compute the Deconvolution images and return a Stack array of three 8-bit
      * images. If the specimen is stained with a 2 colour scheme (such as H &amp;

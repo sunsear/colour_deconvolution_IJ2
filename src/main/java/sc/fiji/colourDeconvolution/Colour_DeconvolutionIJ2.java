@@ -7,7 +7,6 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 import net.imagej.Dataset;
-import net.imagej.ImageJ;
 import net.imagej.ImgPlus;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
@@ -41,12 +40,12 @@ public class Colour_DeconvolutionIJ2 implements Command {
     @Parameter(type = ItemIO.OUTPUT)
     private ImgPlus<UnsignedByteType> deconvolutedImage3;
 
-    public static void main(String[] args) {
-        // Launch ImageJ as usual.
-        final ImageJ ij = new ImageJ();
-
-        ij.launch(args);
-    }
+//    public static void main(String[] args) {
+//        // Launch ImageJ as usual.
+//        final ImageJ ij = new ImageJ();
+//
+//        ij.launch(args);
+//    }
 
     /**
      * Produces an output with the well-known "Hello, World!" message. The
