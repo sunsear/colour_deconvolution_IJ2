@@ -11,7 +11,8 @@ import net.imagej.Dataset;
 import net.imagej.ImgPlus;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
-@Plugin(type = Command.class, headless = true, menuPath = "Histo>Colour Deconvolution")
+@Plugin(type = Command.class, headless = true, menuPath = "Histo>Colour Deconvolution", label = "Colour Deconvolution",
+        description = "This plugin assumes an RGB image as it's input and does a 2-colour deconvolution on it.")
 public class Colour_DeconvolutionIJ2 implements Command {
 
     @Parameter(type = INPUT, label = "Colour 1 Red mean",
@@ -35,7 +36,7 @@ public class Colour_DeconvolutionIJ2 implements Command {
     private final Double B2 = 0.6259511;
 
     @Parameter(type = INPUT, label = "Image to colour deconvolve",
-            description = "The image that you would like to apply colour deconvolution on.")
+            description = "The image that you would like to apply colour deconvolution on. Should be an RGB image!")
     private Dataset dataset;
 
     @Parameter(type = OUTPUT, label = "Colour 1 deconvolved Image")
