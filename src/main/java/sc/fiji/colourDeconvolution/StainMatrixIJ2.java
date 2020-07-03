@@ -9,7 +9,7 @@ import net.imglib2.type.numeric.integer.UnsignedByteType;
 
 public class StainMatrixIJ2 extends StainMatrixBase {
     /**
-     * Compute the Deconvolution images and return a Stack array of three 8-bit
+     * Compute the Deconvolution images and return an ImgPlus array of three 8-bit
      * images. If the specimen is stained with a 2 colour scheme (such as H &amp;
      * E) the 3rd image represents the complimentary of the first two colours
      * (i.e. green).
@@ -24,16 +24,15 @@ public class StainMatrixIJ2 extends StainMatrixBase {
 
         int width = (int) img.dimension(0);
         int height = (int) img.dimension(1);
+
         double log255 = Math.log(255.0);
-//        // Translate ------------------
-        int imageSize = width * height;
 
         RandomAccess<UnsignedByteType> randomAccess = img.randomAccess();
 
         byte[][] newpixels = new byte[3][];
-        newpixels[0] = new byte[imageSize];
-        newpixels[1] = new byte[imageSize];
-        newpixels[2] = new byte[imageSize];
+        newpixels[0] = new byte[width * height];
+        newpixels[1] = new byte[width * height];
+        newpixels[2] = new byte[width * height];
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
