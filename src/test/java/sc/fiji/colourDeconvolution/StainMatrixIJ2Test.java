@@ -1,5 +1,6 @@
 package sc.fiji.colourDeconvolution;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
@@ -32,8 +33,24 @@ public class StainMatrixIJ2Test {
         datasetIOService.save(new DefaultDataset(datasetIOService.context(), computed[2]), "target/ij2-outputDeconvoluted3.tif");
         ImagePlus expected1 = new ImagePlus("src/test/resources/expectedDeconvoluted1.tif");
         new ImageCalculator().run("Difference", expected1, new ImagePlus("target/ij2-outputDeconvoluted1.tif"));
-        assertEquals("Difference at first sample point should be 0", 0, expected1.getPixel(15, 15)[0]);
-        assertEquals("Difference at first sample point should be 0", 0, expected1.getPixel(1500, 150)[0]);
-        assertEquals("Difference at first sample point should be 0", 0, expected1.getPixel(150, 1500)[0]);
+        assertArrayEquals("Difference between 2 images should be 0 at every point.",
+                new byte[6980 * 1646], (byte[]) expected1.getImageStack().getPixels(1));
+    }
+
+    @Test
+    public void testColourDeconvolutionOnSmallImage() throws IOException {
+        ImageJ ij = new ImageJ();
+        DatasetIOService datasetIOService = ij.scifio().datasetIO();
+        Dataset dataset = datasetIOService.open("src/test/resources/small2ColourImage.tif");
+        @SuppressWarnings("unchecked")
+        ImgPlus<UnsignedByteType> imagePlus = (ImgPlus<UnsignedByteType>) dataset.getImgPlus();
+        StainMatrixIJ2 stainMatrix = new StainMatrixIJ2();
+        stainMatrix.init("test stain", 0.66645944, 0.6332006, 0.39355922, 0.25378, 0.737415, 0.6259511, 0, 0, 0);
+        ImgPlus<UnsignedByteType>[] computed = stainMatrix.compute(imagePlus);
+        assertEquals("We expect there to be 3 result images", 3, computed.length);
+        ImagePlus expected1 = new ImagePlus("src/test/resources/expectedSmallDeconvoluted1.tif");
+        datasetIOService.save(new DefaultDataset(datasetIOService.context(), computed[0]), "target/ij2-outputSmallDeconvoluted1.tif");
+        new ImageCalculator().run("Difference", expected1, new ImagePlus("target/ij2-outputSmallDeconvoluted1.tif"));
+        assertArrayEquals(new byte[30 * 30], (byte[]) expected1.getImageStack().getPixels(1));
     }
 }
