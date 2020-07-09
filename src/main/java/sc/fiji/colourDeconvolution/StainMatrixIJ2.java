@@ -1,13 +1,22 @@
 package sc.fiji.colourDeconvolution;
 
 import net.imagej.ImgPlus;
-import net.imglib2.RandomAccess;
+import net.imglib2.FinalDimensions;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.converter.ColorChannelOrder;
+import net.imglib2.converter.Converters;
 import net.imglib2.display.ColorTable8;
 import net.imglib2.img.Img;
-import net.imglib2.img.array.ArrayImgs;
+import net.imglib2.loops.LoopBuilder;
+import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
+import net.imglib2.view.Views;
+import net.imglib2.view.composite.NumericComposite;
 
 public class StainMatrixIJ2 extends StainMatrixBase {
+
+    public static final double LOG_255 = Math.log(255.0);
+
     /**
      * Compute the Deconvolution images and return an ImgPlus array of three 8-bit
      * images. If the specimen is stained with a 2 colour scheme (such as H &amp;
@@ -25,50 +34,52 @@ public class StainMatrixIJ2 extends StainMatrixBase {
         int width = (int) img.dimension(0);
         int height = (int) img.dimension(1);
 
-        double log255 = Math.log(255.0);
+        RandomAccessibleInterval<NumericComposite<UnsignedByteType>> collapseNumeric = Views.collapseNumeric(img);
+        RandomAccessibleInterval<ARGBType> mergeARGB = Converters.mergeARGB(img, ColorChannelOrder.RGB);
 
-        RandomAccess<UnsignedByteType> randomAccess = img.randomAccess();
+        FinalDimensions dimensions = new FinalDimensions(width, height);
+        Img<UnsignedByteType> outputImg1 = img.factory().create(dimensions);
+        Img<UnsignedByteType> outputImg2 = img.factory().create(dimensions);
+        Img<UnsignedByteType> outputImg3 = img.factory().create(dimensions);
 
-        byte[][] newpixels = new byte[3][];
-        newpixels[0] = new byte[width * height];
-        newpixels[1] = new byte[width * height];
-        newpixels[2] = new byte[width * height];
+        LoopBuilder.setImages(mergeARGB, outputImg1, outputImg2, outputImg3).forEachPixel(
+                (input, out1, out2, out3) -> {
+                    int rgba = input.get();
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int R = randomAccess.get().getInteger();
-                randomAccess.fwd(2);
-                int G = randomAccess.get().getInteger();
-                randomAccess.fwd(2);
-                int B = randomAccess.get().getInteger();
-                randomAccess.move(-2, 2);
+                    double Rlog = logify(ARGBType.red(rgba));
+                    double Glog = logify(ARGBType.green(rgba));
+                    double Blog = logify(ARGBType.blue(rgba));
 
-                double Rlog = -((255.0 * Math.log(((double) R + 1) / 255.0)) / log255);
-                double Glog = -((255.0 * Math.log(((double) G + 1) / 255.0)) / log255);
-                double Blog = -((255.0 * Math.log(((double) B + 1) / 255.0)) / log255);
-
-                for (int deconvolvedColour = 0; deconvolvedColour < 3; deconvolvedColour++) {
                     // Rescale to match original paper values
-                    double Rscaled = Rlog * q[deconvolvedColour * 3];
-                    double Gscaled = Glog * q[deconvolvedColour * 3 + 1];
-                    double Bscaled = Blog * q[deconvolvedColour * 3 + 2];
-                    double output = Math.exp(-((Rscaled + Gscaled + Bscaled) - 255.0) * log255 / 255.0);
-                    if (output > 255) output = 255;
-                    newpixels[deconvolvedColour][width * y + x] = (byte) (0xff & (int) (Math.floor(output + .5)));
+                    double output = Math.exp(-((Rlog * q[0] + Glog * q[1] + Blog * q[2]) - 255.0) * LOG_255 / 255.0);
+                    out1.set(output > 255 ? 255 : (int) Math.round(output));
+
+                    output = Math.exp(-((Rlog * q[3] + Glog * q[4] + Blog * q[5]) - 255.0) * LOG_255 / 255.0);
+                    out2.set(output > 255 ? 255 : (int) Math.round(output));
+
+                    output = Math.exp(-((Rlog * q[6] + Glog * q[7] + Blog * q[8]) - 255.0) * LOG_255 / 255.0);
+                    out3.set(output > 255 ? 255 : (int) Math.round(output));
                 }
-                randomAccess.fwd(0);
-            }
-            randomAccess.move(-width, 0);
-            randomAccess.fwd(1);
-        }
+        );
 
         @SuppressWarnings("unchecked")
         ImgPlus<UnsignedByteType>[] outputImages = new ImgPlus[3];
-        outputImages[0] = new ImgPlus<>(ArrayImgs.unsignedBytes(newpixels[0], width, height));
-        outputImages[1] = new ImgPlus<>(ArrayImgs.unsignedBytes(newpixels[1], width, height));
-        outputImages[2] = new ImgPlus<>(ArrayImgs.unsignedBytes(newpixels[2], width, height));
+        outputImages[0] = new ImgPlus<>(outputImg1);
+        outputImages[1] = new ImgPlus<>(outputImg2);
+        outputImages[2] = new ImgPlus<>(outputImg3);
         initializeColorTables(outputImages);
         return outputImages;
+    }
+
+    /**
+     * This function converts all values between 0 and 255 according to a logarithmical curve. See testLogify to
+     * see the distribution of the numbers
+     *
+     * @param colourValue the unsigned byte colourvalue of a specific pixel, so between 0 and 255
+     * @return logarothmically redistributed value
+     */
+    double logify(double colourValue) {
+        return -((255.0 * Math.log((colourValue + 1) / 255.0)) / LOG_255);
     }
 
     private ImgPlus<UnsignedByteType>[] initializeColorTables(ImgPlus<UnsignedByteType>[] outputImages) {
