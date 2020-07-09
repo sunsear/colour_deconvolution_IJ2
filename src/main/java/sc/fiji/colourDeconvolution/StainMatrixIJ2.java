@@ -47,14 +47,14 @@ public class StainMatrixIJ2 extends StainMatrixBase {
                 double Glog = -((255.0 * Math.log(((double) G + 1) / 255.0)) / log255);
                 double Blog = -((255.0 * Math.log(((double) B + 1) / 255.0)) / log255);
 
-                for (int channel = 0; channel < 3; channel++) {
+                for (int deconvolvedColour = 0; deconvolvedColour < 3; deconvolvedColour++) {
                     // Rescale to match original paper values
-                    double Rscaled = Rlog * q[channel * 3];
-                    double Gscaled = Glog * q[channel * 3 + 1];
-                    double Bscaled = Blog * q[channel * 3 + 2];
+                    double Rscaled = Rlog * q[deconvolvedColour * 3];
+                    double Gscaled = Glog * q[deconvolvedColour * 3 + 1];
+                    double Bscaled = Blog * q[deconvolvedColour * 3 + 2];
                     double output = Math.exp(-((Rscaled + Gscaled + Bscaled) - 255.0) * log255 / 255.0);
                     if (output > 255) output = 255;
-                    newpixels[channel][width * y + x] = (byte) (0xff & (int) (Math.floor(output + .5)));
+                    newpixels[deconvolvedColour][width * y + x] = (byte) (0xff & (int) (Math.floor(output + .5)));
                 }
                 randomAccess.fwd(0);
             }
