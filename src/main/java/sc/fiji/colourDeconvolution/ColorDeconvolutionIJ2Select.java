@@ -13,9 +13,9 @@ import net.imagej.Dataset;
 import net.imagej.ImgPlus;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
-@Plugin(type = Command.class, headless = true, menuPath = "Histo>Colour Deconvolution select", label = "Colour Deconvolution select",
-        description = "This plugin assumes an RGB image as it's input and does a 3-colour deconvolution on it with the values selected from the pulldown.")
-public class Colour_DeconvolutionIJ2_select implements Command {
+@Plugin(type = Command.class, headless = true, menuPath = "Image>Color>Color Deconvolution Select", label = "Color Deconvolution Select",
+        description = "This plugin assumes an RGB image as it's input and does a 3-color deconvolution on it with the values selected from the pulldown.")
+public class ColorDeconvolutionIJ2Select implements Command {
 
     @Parameter(type = INPUT, label = " select deconvolution type",
                description = "values used for the deconvolution",
@@ -25,7 +25,7 @@ public class Colour_DeconvolutionIJ2_select implements Command {
                initializer = "default")
     private String selection = H_E_DESCR;
 
-    @Parameter(type = INPUT, label = "Image to colour deconvolve",
+    @Parameter(type = INPUT, label = "Image to color deconvolve",
             description = "The image that you would like to apply colour deconvolution on. Should be an RGB image!")
     private Dataset dataset;
 
@@ -37,7 +37,7 @@ public class Colour_DeconvolutionIJ2_select implements Command {
             description = "Remainder after the other 2 colours have been subtracted. Should be close to empty")
     private ImgPlus<UnsignedByteType> deconvolutedImage3;
 
-    public Colour_DeconvolutionIJ2_select() {
+    public ColorDeconvolutionIJ2Select() {
     }
 
     /**
