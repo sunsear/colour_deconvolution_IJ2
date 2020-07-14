@@ -289,20 +289,19 @@ public class StainMatrixIJ2 extends StainMatrixBase {
     }
 
     private ImgPlus<UnsignedByteType>[] initializeColorTables(ImgPlus<UnsignedByteType>[] outputImages) {
-        byte[] rLUT = new byte[256];
-        byte[] gLUT = new byte[256];
-        byte[] bLUT = new byte[256];
+        byte[][] rLUT = new byte[3][256];
+        byte[][] gLUT = new byte[3][256];
+        byte[][] bLUT = new byte[3][256];
 
         for (int channel = 0; channel < 3; channel++) {
             for (int j = 0; j < 256; j++) { //LUT[1]
-                rLUT[255 - j] = (byte) (255.0 - (double) j * cosx[channel]);
-                gLUT[255 - j] = (byte) (255.0 - (double) j * cosy[channel]);
-                bLUT[255 - j] = (byte) (255.0 - (double) j * cosz[channel]);
+                rLUT[channel][255 - j] = (byte) (255.0 - (double) j * cosx[channel]);
+                gLUT[channel][255 - j] = (byte) (255.0 - (double) j * cosy[channel]);
+                bLUT[channel][255 - j] = (byte) (255.0 - (double) j * cosz[channel]);
             }
-            outputImages[channel].initializeColorTables(3);
-            outputImages[channel].setColorTable(new ColorTable8(rLUT), 0);
-            outputImages[channel].setColorTable(new ColorTable8(gLUT), 1);
-            outputImages[channel].setColorTable(new ColorTable8(bLUT), 2);
+            outputImages[channel].initializeColorTables(1);
+            final ColorTable8 colorTable8 = new ColorTable8(rLUT[channel], gLUT[channel], bLUT[channel]);
+            outputImages[channel].setColorTable(colorTable8, 0);
         }
         return outputImages;
     }
@@ -321,16 +320,11 @@ public class StainMatrixIJ2 extends StainMatrixBase {
 
         Img<UnsignedByteType> img = imp.getImg();
 
-        int width = (int) img.dimension(0);
-        int height = (int) img.dimension(1);
-
-        RandomAccessibleInterval<NumericComposite<UnsignedByteType>> collapseNumeric = Views.collapseNumeric(img);
         RandomAccessibleInterval<ARGBType> mergeARGB = Converters.mergeARGB(img, ColorChannelOrder.RGB);
 
-        FinalDimensions dimensions = new FinalDimensions(width, height);
-        Img<UnsignedByteType> outputImg1 = img.factory().create(dimensions);
-        Img<UnsignedByteType> outputImg2 = img.factory().create(dimensions);
-        Img<UnsignedByteType> outputImg3 = img.factory().create(dimensions);
+        Img<UnsignedByteType> outputImg1 = img.factory().create(mergeARGB);
+        Img<UnsignedByteType> outputImg2 = img.factory().create(mergeARGB);
+        Img<UnsignedByteType> outputImg3 = img.factory().create(mergeARGB);
 
         LoopBuilder.setImages(mergeARGB, outputImg1, outputImg2, outputImg3).forEachPixel(
                 (input, out1, out2, out3) -> {
