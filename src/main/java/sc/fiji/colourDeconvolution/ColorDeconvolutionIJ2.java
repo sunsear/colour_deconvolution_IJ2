@@ -9,6 +9,7 @@ import org.scijava.plugin.Plugin;
 
 import net.imagej.Dataset;
 import net.imagej.ImgPlus;
+import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
 @Plugin(type = Command.class, headless = true, menuPath = "Image>Color>Color Deconvolution 2", label = "Color Deconvolution",
@@ -67,8 +68,11 @@ public class ColorDeconvolutionIJ2 implements Command {
     public void run() {
         StainMatrixIJ2 sm = new StainMatrixIJ2();
         sm.init("User defined stain", R1, G1, B1, R2, G2, B2, R3, G3, B3);
+        final ImgPlus<? extends RealType<?>> imgPlus = dataset.getImgPlus();
+
+        imgPlus.factory().type();
         @SuppressWarnings("unchecked")
-        ImgPlus<UnsignedByteType>[] imageStacks = sm.compute((ImgPlus<UnsignedByteType>) dataset.getImgPlus());
+        ImgPlus<UnsignedByteType>[] imageStacks = sm.compute((ImgPlus<UnsignedByteType>) imgPlus);
         deconvolutedImage1 = imageStacks[0];
         deconvolutedImage2 = imageStacks[1];
         deconvolutedImage3 = imageStacks[2];

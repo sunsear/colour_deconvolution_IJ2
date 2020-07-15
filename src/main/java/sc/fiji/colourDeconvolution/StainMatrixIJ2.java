@@ -1,7 +1,6 @@
 package sc.fiji.colourDeconvolution;
 
 import net.imagej.ImgPlus;
-import net.imglib2.FinalDimensions;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.converter.ColorChannelOrder;
 import net.imglib2.converter.Converters;
@@ -10,8 +9,6 @@ import net.imglib2.img.Img;
 import net.imglib2.loops.LoopBuilder;
 import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
-import net.imglib2.view.Views;
-import net.imglib2.view.composite.NumericComposite;
 
 public class StainMatrixIJ2 extends StainMatrixBase {
 
