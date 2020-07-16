@@ -68,11 +68,9 @@ public class ColorDeconvolutionIJ2 implements Command {
     public void run() {
         StainMatrixIJ2 sm = new StainMatrixIJ2();
         sm.init("User defined stain", R1, G1, B1, R2, G2, B2, R3, G3, B3);
-        final ImgPlus<? extends RealType<?>> imgPlus = dataset.getImgPlus();
 
-        imgPlus.factory().type();
         @SuppressWarnings("unchecked")
-        ImgPlus<UnsignedByteType>[] imageStacks = sm.compute((ImgPlus<UnsignedByteType>) imgPlus);
+        ImgPlus<UnsignedByteType>[] imageStacks = sm.compute((ImgPlus<UnsignedByteType>) dataset.getImgPlus());
         deconvolutedImage1 = imageStacks[0];
         deconvolutedImage2 = imageStacks[1];
         deconvolutedImage3 = imageStacks[2];

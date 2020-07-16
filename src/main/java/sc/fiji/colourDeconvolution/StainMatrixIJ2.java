@@ -286,19 +286,19 @@ public class StainMatrixIJ2 extends StainMatrixBase {
     }
 
     private ImgPlus<UnsignedByteType>[] initializeColorTables(ImgPlus<UnsignedByteType>[] outputImages) {
-        byte[][] rLUT = new byte[3][256];
-        byte[][] gLUT = new byte[3][256];
-        byte[][] bLUT = new byte[3][256];
 
-        for (int channel = 0; channel < 3; channel++) {
+        for (int imageNumber = 0; imageNumber < 3; imageNumber++) {
+            byte[] rLUT = new byte[256];
+            byte[] gLUT = new byte[256];
+            byte[] bLUT = new byte[256];
             for (int j = 0; j < 256; j++) { //LUT[1]
-                rLUT[channel][255 - j] = (byte) (255.0 - (double) j * cosx[channel]);
-                gLUT[channel][255 - j] = (byte) (255.0 - (double) j * cosy[channel]);
-                bLUT[channel][255 - j] = (byte) (255.0 - (double) j * cosz[channel]);
+                rLUT[255 - j] = (byte) (255.0 - (double) j * cosx[imageNumber]);
+                gLUT[255 - j] = (byte) (255.0 - (double) j * cosy[imageNumber]);
+                bLUT[255 - j] = (byte) (255.0 - (double) j * cosz[imageNumber]);
             }
-            outputImages[channel].initializeColorTables(1);
-            final ColorTable8 colorTable8 = new ColorTable8(rLUT[channel], gLUT[channel], bLUT[channel]);
-            outputImages[channel].setColorTable(colorTable8, 0);
+            outputImages[imageNumber].initializeColorTables(1);
+            final ColorTable8 colorTable8 = new ColorTable8(rLUT, gLUT, bLUT);
+            outputImages[imageNumber].setColorTable(colorTable8, 0);
         }
         return outputImages;
     }
