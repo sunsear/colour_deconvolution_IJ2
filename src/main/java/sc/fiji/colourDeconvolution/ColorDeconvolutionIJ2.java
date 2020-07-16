@@ -17,33 +17,33 @@ public class ColorDeconvolutionIJ2 implements Command {
 
     @Parameter(type = INPUT, label = "Colour 1 Red mean",
             description = "The mean value for Red pixels in colour 1, should be between 0 and 1", max = "1", min = "0")
-    private Double R1 = 0.66645944;
+    private Double r1 = 0.66645944;
     @Parameter(type = INPUT, label = "Colour 1 Green mean",
             description = "The mean value for Green pixels in colour 1, should be between 0 and 1", max = "1", min = "0")
-    private Double G1 = 0.6332006;
+    private Double g1 = 0.6332006;
     @Parameter(type = INPUT, label = "Colour 1 Blue mean",
             description = "The mean value for Blue pixels in colour 1, should be between 0 and 1", max = "1", min = "0")
-    private Double B1 = 0.39355922;
+    private Double b1 = 0.39355922;
 
     @Parameter(type = INPUT, label = "Colour 2 Red mean",
             description = "The mean value for Red pixels in colour 2, should be between 0 and 1", max = "1", min = "0")
-    private Double R2 = 0.25378;
+    private Double r2 = 0.25378;
     @Parameter(type = INPUT, label = "Colour 2 Green mean",
             description = "The mean value for Green pixels in colour 2, should be between 0 and 1", max = "1", min = "0")
-    private Double G2 = 0.737415;
+    private Double g2 = 0.737415;
     @Parameter(type = INPUT, label = "Colour 2 Blue mean",
             description = "The mean value for Blue pixels in colour 2, should be between 0 and 1", max = "1", min = "0")
-    private Double B2 = 0.6259511;
+    private Double b2 = 0.6259511;
 
     @Parameter(type = INPUT, label = "Colour 3 Red mean",
             description = "The mean value for Red pixels in colour 3, should be between 0 and 1", max = "1", min = "0")
-    private Double R3 = 0.0;
+    private Double r3 = 0.0;
     @Parameter(type = INPUT, label = "Colour 3 Green mean",
             description = "The mean value for Green pixels in colour 3, should be between 0 and 1", max = "1", min = "0")
-    private Double G3 = 0.0;
+    private Double g3 = 0.0;
     @Parameter(type = INPUT, label = "Colour 3 Blue mean",
             description = "The mean value for Blue pixels in colour 3, should be between 0 and 1", max = "1", min = "0")
-    private Double B3 = 0.0;
+    private Double b3 = 0.0;
 
     @Parameter(type = INPUT, label = "Image to colour deconvolve",
             description = "The image that you would like to apply colour deconvolution on. Should be an RGB image!")
@@ -66,7 +66,8 @@ public class ColorDeconvolutionIJ2 implements Command {
     @Override
     public void run() {
         StainMatrixIJ2 sm = new StainMatrixIJ2();
-        sm.init("User defined stain", R1, G1, B1, R2, G2, B2, R3, G3, B3);
+        sm.init("User defined stain", r1, g1, b1, r2, g2, b2, r3, g3, b3);
+
         @SuppressWarnings("unchecked")
         ImgPlus<UnsignedByteType>[] imageStacks = sm.compute((ImgPlus<UnsignedByteType>) dataset.getImgPlus());
         deconvolutedImage1 = imageStacks[0];
