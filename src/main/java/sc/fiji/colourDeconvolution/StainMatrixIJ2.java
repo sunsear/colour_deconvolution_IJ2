@@ -285,7 +285,7 @@ public class StainMatrixIJ2 extends StainMatrixBase {
         return LOGIFY_LOOKUP[colourValue];
     }
 
-    private ImgPlus<UnsignedByteType>[] initializeColorTables(ImgPlus<UnsignedByteType>[] outputImages) {
+    private void initializeColorTables(ImgPlus<UnsignedByteType>[] outputImages) {
 
         for (int imageNumber = 0; imageNumber < 3; imageNumber++) {
             byte[] rLUT = new byte[256];
@@ -300,7 +300,6 @@ public class StainMatrixIJ2 extends StainMatrixBase {
             final ColorTable8 colorTable8 = new ColorTable8(rLUT, gLUT, bLUT);
             outputImages[imageNumber].setColorTable(colorTable8, 0);
         }
-        return outputImages;
     }
 
     /**
@@ -327,18 +326,18 @@ public class StainMatrixIJ2 extends StainMatrixBase {
                 (input, out1, out2, out3) -> {
                     int rgba = input.get();
 
-                    double Rlog = LOGIFY_LOOKUP[ARGBType.red(rgba)];
-                    double Glog = LOGIFY_LOOKUP[ARGBType.green(rgba)];
-                    double Blog = LOGIFY_LOOKUP[ARGBType.blue(rgba)];
+                    double rLog = LOGIFY_LOOKUP[ARGBType.red(rgba)];
+                    double gLog = LOGIFY_LOOKUP[ARGBType.green(rgba)];
+                    double bLog = LOGIFY_LOOKUP[ARGBType.blue(rgba)];
 
                     // Rescale to match original paper values
-                    double output = Math.exp(-((Rlog * q[0] + Glog * q[1] + Blog * q[2]) - 255.0) * LOG_255 / 255.0);
+                    double output = Math.exp(-((rLog * q[0] + gLog * q[1] + bLog * q[2]) - 255.0) * LOG_255 / 255.0);
                     out1.set(output > 255 ? 255 : (int) Math.round(output));
 
-                    output = Math.exp(-((Rlog * q[3] + Glog * q[4] + Blog * q[5]) - 255.0) * LOG_255 / 255.0);
+                    output = Math.exp(-((rLog * q[3] + gLog * q[4] + bLog * q[5]) - 255.0) * LOG_255 / 255.0);
                     out2.set(output > 255 ? 255 : (int) Math.round(output));
 
-                    output = Math.exp(-((Rlog * q[6] + Glog * q[7] + Blog * q[8]) - 255.0) * LOG_255 / 255.0);
+                    output = Math.exp(-((rLog * q[6] + gLog * q[7] + bLog * q[8]) - 255.0) * LOG_255 / 255.0);
                     out3.set(output > 255 ? 255 : (int) Math.round(output));
                 }
         );
