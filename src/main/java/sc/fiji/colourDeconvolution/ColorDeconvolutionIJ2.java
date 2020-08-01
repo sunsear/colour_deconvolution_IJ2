@@ -11,7 +11,7 @@ import net.imagej.Dataset;
 import net.imagej.ImgPlus;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
-@Plugin(type = Command.class, headless = true, menuPath = "Image>Color>Color Deconvolution 2", label = "Color Deconvolution",
+@Plugin(type = Command.class, headless = true, menuPath = "Image>Color>Color Deconvolution for ImageJ2>User Values", label = "Color Deconvolution from User Values",
         description = "This plugin assumes an RGB image as it's input and does a 2-colour deconvolution on it.")
 public class ColorDeconvolutionIJ2 implements Command {
 

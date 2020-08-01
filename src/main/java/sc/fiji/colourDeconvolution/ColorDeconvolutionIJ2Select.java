@@ -2,8 +2,22 @@ package sc.fiji.colourDeconvolution;
 
 import static org.scijava.ItemIO.INPUT;
 import static org.scijava.ItemIO.OUTPUT;
-import static sc.fiji.colourDeconvolution.StainParameters.*;
-import static sc.fiji.colourDeconvolution.StainParameters.Constants.*;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.ALC_B_H_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.A_Z_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.CMY_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.FLG_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.FR_FB_DAB_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.GIEMSA_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.H_AEC_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.H_E2_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.H_E_DAB_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.H_E_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.H_PAS_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.MAS_TRI_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.MG_DAB_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.RGB_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.H_E;
+import static sc.fiji.colourDeconvolution.StainParameters.values;
 
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
@@ -13,7 +27,7 @@ import net.imagej.Dataset;
 import net.imagej.ImgPlus;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
-@Plugin(type = Command.class, headless = true, menuPath = "Image>Color>Color Deconvolution Select", label = "Color Deconvolution Select",
+@Plugin(type = Command.class, headless = true, menuPath = "Image>Color>Color Deconvolution for ImageJ2>Preconfigured Values", label = "Color Deconvolution from Preconfigured Values",
         description = "This plugin assumes an RGB image as it's input and does a 3-color deconvolution on it with the values selected from the pulldown.")
 public class ColorDeconvolutionIJ2Select implements Command {
 
