@@ -12,7 +12,7 @@ import net.imagej.ImgPlus;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
 @Plugin(type = Command.class, headless = true, label = "Color Deconvolution",
-        description = "This plugin assumes an RGB image as it's input and does a 2-colour deconvolution on it.")
+        description = "This plugin assumes an RGB image as it's input and does a colour deconvolution on it.")
 public class ColorDeconvolutionIJ2FromValues implements Command {
 
     @Parameter(type = INPUT, label = "Colour 1 Red mean",
@@ -54,7 +54,7 @@ public class ColorDeconvolutionIJ2FromValues implements Command {
     @Parameter(type = OUTPUT, label = "Colour 2 deconvolved Image")
     private ImgPlus<UnsignedByteType> deconvolutedImage2;
     @Parameter(type = OUTPUT, label = "Remainder or colour 3",
-            description = "Remainder after the other 2 colours have been subtracted. Should be close to empty if colour 3 values are left to 0")
+            description = "Colour 3 deconvolved image or remainder after the other 2 colours have been subtracted. Should be close to empty if colour 3 values are left to 0")
     private ImgPlus<UnsignedByteType> deconvolutedImage3;
 
     public ColorDeconvolutionIJ2FromValues() {
