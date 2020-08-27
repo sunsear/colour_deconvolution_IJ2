@@ -27,4 +27,4 @@ jobs:
         with:
           java-version: 1.8
       - name: Build with Maven
-        run: mvn -B release:prepare --file pom.xml -f pom.xml
+        run: mvn -B release:prepare --file pom.xml -f pom.xml -DreleaseVersion=${{ github.event.inputs.version }} -DdevelopmentVersion=${{ github.event.inputs.next_version }}
