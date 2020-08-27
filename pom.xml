@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
 		<version>27.0.1</version>
-		<relativePath />
+		<relativePath/>
 	</parent>
 
-	<groupId>sc.fiji</groupId>
-	<artifactId>Colour_Deconvolution</artifactId>
-	<version>3.0.4-SNAPSHOT</version>
+	<groupId>com.regmedxb</groupId>
+	<artifactId>Colour_Deconvolution_IJ2</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
 
-	<name>Colour Deconvolution</name>
-	<description>Colour Deconvolution plugin for Fiji.</description>
-	<url>https://imagej.net/Colour_Deconvolution</url>
-	<inceptionYear>2011</inceptionYear>
+	<name>Colour Deconvolution for ImageJ2</name>
+	<description>Colour Deconvolution plugin for ImageJ2 and related projects such as Knime.</description>
+	<url>https://github.com/sunsear/colour_deconvolution_IJ2</url>
+	<inceptionYear>2020</inceptionYear>
 	<organization>
-		<name>Fiji</name>
-		<url>https://fiji.sc/</url>
+		<name>RegMedXB</name>
+		<url>http://regmedxb.com/</url>
 	</organization>
 	<licenses>
 		<license>
@@ -31,9 +32,9 @@
 
 	<developers>
 		<developer>
-			<id>landinig</id>
-			<name>Gabriel Landini</name>
-			<url>https://imagej.net/User:Landini</url>
+			<id>sunsear</id>
+			<name>Martin van Dijken</name>
+			<url>https://www.linkedin.com/in/sunsear/</url>
 			<roles>
 				<role>founder</role>
 				<role>lead</role>
@@ -45,30 +46,20 @@
 			</roles>
 		</developer>
 		<developer>
-			<id>ctrueden</id>
-			<name>Curtis Rueden</name>
-			<url>https://imagej.net/User:Rueden</url>
+			<id>boudewijn-van-langerak/</id>
+			<name>Boudewijn van Langerak</name>
+			<url>https://www.linkedin.com/in/boudewijn-van-langerak/</url>
 			<roles>
+				<role>founder</role>
+				<role>lead</role>
+				<role>developer</role>
+				<role>debugger</role>
+				<role>reviewer</role>
+				<role>support</role>
 				<role>maintainer</role>
 			</roles>
 		</developer>
 	</developers>
-	<contributors>
-		<contributor>
-			<name>Johannes Schindelin</name>
-			<url>https://imagej.net/User:Schindelin</url>
-			<properties><id>dscho</id></properties>
-		</contributor>
-		<contributor>
-			<name>Mark Hiner</name>
-			<url>https://imagej.net/User:Hinerm</url>
-			<properties><id>hinerm</id></properties>
-		</contributor>
-		<contributor>
-			<name>Benjamin Pavie</name>
-			<properties><id>bpavie</id></properties>
-		</contributor>
-	</contributors>
 
 	<mailingLists>
 		<mailingList>
@@ -78,14 +69,14 @@
 	</mailingLists>
 
 	<scm>
-		<connection>scm:git:git://github.com/fiji/Colour_Deconvolution</connection>
-		<developerConnection>scm:git:git@github.com:fiji/Colour_Deconvolution</developerConnection>
+		<connection>scm:git:git://github.com/sunsear/colour_deconvolution_IJ2</connection>
+		<developerConnection>scm:git:git@github.com:sunsear/colour_deconvolution_IJ2</developerConnection>
 		<tag>HEAD</tag>
-		<url>https://github.com/fiji/Colour_Deconvolution</url>
+		<url>https://github.com/sunsear/colour_deconvolution_IJ2</url>
 	</scm>
 	<issueManagement>
 		<system>GitHub Issues</system>
-		<url>https://github.com/fiji/Colour_Deconvolution/issues</url>
+		<url>https://github.com/sunsear/colour_deconvolution_IJ2/issues</url>
 	</issueManagement>
 	<ciManagement>
 		<system>Travis CI</system>
@@ -93,10 +84,10 @@
 	</ciManagement>
 
 	<properties>
-		<package-name>sc.fiji.colourDeconvolution</package-name>
+		<package-name>com.regmedxb.colourDeconvolutionIJ2</package-name>
 		<license.licenseName>gpl_v3</license.licenseName>
-		<license.copyrightOwners>Fiji developers.</license.copyrightOwners>
-		<license.projectName>Fiji distribution of ImageJ for the life sciences.</license.projectName>
+		<license.copyrightOwners>RegMedXB developers.</license.copyrightOwners>
+		<license.projectName>Colour Deconvolution for ImageJ2</license.projectName>
 
 		<!-- NB: Deploy releases to the SciJava Maven repository. -->
 		<releaseProfiles>deploy-to-scijava</releaseProfiles>
