@@ -19,6 +19,31 @@ import net.imagej.ImgPlus;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
 public class StainMatrixIJ2Test {
+
+    @Test
+    public void testColourDeconvolutionFor3PrimalColours() throws IOException {
+        ImageJ ij = new ImageJ();
+        DatasetIOService datasetIOService = ij.scifio().datasetIO();
+        Dataset dataset = datasetIOService.open("src/test/resources/primal.tif");
+        @SuppressWarnings("unchecked")
+        ImgPlus<UnsignedByteType> imagePlus = (ImgPlus<UnsignedByteType>) dataset.getImgPlus();
+        StainMatrixIJ2 stainMatrix = new StainMatrixIJ2();
+        stainMatrix.init("Primal colours", -4.9944286E-4, 0.7071067, 0.7071067, 0.7071067, -4.9944286E-4, 0.7071067, 0.7071067, 0.7071067, -4.9944286E-4);
+
+        Instant start = Instant.now();
+        ImgPlus<UnsignedByteType>[] computed = stainMatrix.compute(imagePlus);
+        System.out.println("Compute took " + Duration.between(start, Instant.now()));
+
+        assertEquals("We expect there to be 3 result images", 3, computed.length);
+        datasetIOService.save(new DefaultDataset(datasetIOService.context(), computed[0]), "target/ij2-outputPrimalColour1.tif");
+        datasetIOService.save(new DefaultDataset(datasetIOService.context(), computed[1]), "target/ij2-outputPrimalColour2.tif");
+        datasetIOService.save(new DefaultDataset(datasetIOService.context(), computed[2]), "target/ij2-outputPrimalColour3.tif");
+        ImagePlus expected1 = new ImagePlus("src/test/resources/expectedPrimalColour1.tif");
+        new ImageCalculator().run("Difference", expected1, new ImagePlus("target/ij2-outputPrimalColour1.tif"));
+        assertArrayEquals("Difference between 2 images should be 0 at every point.",
+                new byte[40 * 40], (byte[]) expected1.getImageStack().getPixels(1));
+    }
+
     @Test
     public void testColourDeconvolutionFor2Colours() throws IOException {
         ImageJ ij = new ImageJ();
