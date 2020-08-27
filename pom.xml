@@ -60,7 +60,13 @@
 			</roles>
 		</developer>
 	</developers>
-	<contributors/>
+	<contributors>
+		<contributor>
+			<email>martin@van-dijken.eu</email>
+			<name>Martin van Dijken</name>
+			<organization>RegMedXB</organization>
+		</contributor>
+	</contributors>
 
 	<mailingLists>
 		<mailingList>
