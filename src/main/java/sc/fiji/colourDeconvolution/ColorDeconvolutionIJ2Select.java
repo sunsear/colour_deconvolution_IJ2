@@ -2,10 +2,27 @@ package sc.fiji.colourDeconvolution;
 
 import static org.scijava.ItemIO.INPUT;
 import static org.scijava.ItemIO.OUTPUT;
-import static sc.fiji.colourDeconvolution.StainParameters.*;
-import static sc.fiji.colourDeconvolution.StainParameters.Constants.*;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.ALC_B_H_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.A_Z_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.CMY_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.FLG_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.FR_FB_DAB_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.GIEMSA_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.H_AEC_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.H_E2_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.H_E_DAB_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.H_E_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.H_PAS_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.MAS_TRI_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.MG_DAB_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.Constants.RGB_DESCR;
+import static sc.fiji.colourDeconvolution.StainParameters.H_E;
+import static sc.fiji.colourDeconvolution.StainParameters.values;
+
+import java.util.HashMap;
 
 import org.scijava.command.Command;
+import org.scijava.command.CommandService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -13,21 +30,25 @@ import net.imagej.Dataset;
 import net.imagej.ImgPlus;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
-@Plugin(type = Command.class, headless = true, menuPath = "Image>Color>Color Deconvolution Select", label = "Color Deconvolution Select",
+@Plugin(type = Command.class, headless = true, menuPath = "Image>Color>Color Deconvolution for ImageJ2", label = "Color Deconvolution Select",
         description = "This plugin assumes an RGB image as it's input and does a 3-color deconvolution on it with the values selected from the pulldown.")
 public class ColorDeconvolutionIJ2Select implements Command {
+    private static final String USER_VALUES = "User values";
 
     @Parameter(type = INPUT, label = " select deconvolution type",
-               description = "values used for the deconvolution",
-               choices = {H_E_DESCR, H_E2_DESCR, FLG_DESCR, GIEMSA_DESCR, FR_FB_DAB_DESCR, MG_DAB_DESCR, H_E_DAB_DESCR,
-                       H_AEC_DESCR, A_Z_DESCR, MAS_TRI_DESCR, ALC_B_H_DESCR, H_PAS_DESCR, RGB_DESCR, CMY_DESCR },
-               style = "listBox",
-               initializer = "default")
+            description = "values used for the deconvolution",
+            choices = {H_E_DESCR, H_E2_DESCR, FLG_DESCR, GIEMSA_DESCR, FR_FB_DAB_DESCR, MG_DAB_DESCR, H_E_DAB_DESCR,
+                    H_AEC_DESCR, A_Z_DESCR, MAS_TRI_DESCR, ALC_B_H_DESCR, H_PAS_DESCR, RGB_DESCR, CMY_DESCR, USER_VALUES},
+            style = "listBox",
+            initializer = "default")
     private String selection = H_E_DESCR;
 
     @Parameter(type = INPUT, label = "Image to color deconvolve",
             description = "The image that you would like to apply colour deconvolution on. Should be an RGB image!")
     private Dataset dataset;
+
+    @Parameter(type = INPUT)
+    private CommandService commandService;
 
     @Parameter(type = OUTPUT, label = "Colour 1 deconvolved Image")
     private ImgPlus<UnsignedByteType> deconvolutedImage1;
@@ -89,14 +110,18 @@ public class ColorDeconvolutionIJ2Select implements Command {
      */
     @Override
     public void run() {
-        StainMatrixIJ2 sm = new StainMatrixIJ2();
-        StainParameters values = fromString(selection);
-        sm.init("Our stain", values.rgb1()[0], values.rgb1()[1], values.rgb1()[2], values.rgb2()[0], values.rgb2()[1], values.rgb2()[2], values.rgb3()[0], values.rgb3()[1], values.rgb3()[2]);
-        @SuppressWarnings("unchecked")
-        ImgPlus<UnsignedByteType>[] imageStacks = sm.compute((ImgPlus<UnsignedByteType>) dataset.getImgPlus());
-        deconvolutedImage1 = imageStacks[0];
-        deconvolutedImage2 = imageStacks[1];
-        deconvolutedImage3 = imageStacks[2];
+        if (USER_VALUES.equalsIgnoreCase(selection)) {
+            commandService.run(ColorDeconvolutionIJ2FromValues.class, true, new HashMap<>());
+        } else {
+            StainMatrixIJ2 sm = new StainMatrixIJ2();
+            StainParameters values = fromString(selection);
+            sm.init("Our stain", values.rgb1()[0], values.rgb1()[1], values.rgb1()[2], values.rgb2()[0], values.rgb2()[1], values.rgb2()[2], values.rgb3()[0], values.rgb3()[1], values.rgb3()[2]);
+            @SuppressWarnings("unchecked")
+            ImgPlus<UnsignedByteType>[] imageStacks = sm.compute((ImgPlus<UnsignedByteType>) dataset.getImgPlus());
+            deconvolutedImage1 = imageStacks[0];
+            deconvolutedImage2 = imageStacks[1];
+            deconvolutedImage3 = imageStacks[2];
+        }
     }
 
     public static StainParameters fromString(String text) {
@@ -107,6 +132,7 @@ public class ColorDeconvolutionIJ2Select implements Command {
         }
         return H_E;
     }
+
     public static String getAllDescriptions() {
         StringBuilder values = new StringBuilder("{");
         for (StainParameters stainParameter : values()) {
