@@ -292,42 +292,76 @@ public class StainMatrixIJ2 {
     public static final int B = 2;
 
 
-    private double[] opticalDensitiesStain1 = new double[3];
-    private double[] opticalDensitiesStain2 = new double[3];
-    private double[] opticalDensitiesStain3 = new double[3];
+    private final double[] opticalDensitiesStain1 = new double[3];
+    private final double[] opticalDensitiesStain2 = new double[3];
+    private final double[] opticalDensitiesStain3 = new double[3];
 
     //These are the normalized Optical Densities for each color  
-    private double[][] normOD = new double[3][3];
+    private final double[][] normOD = new double[3][3];
 
-    String myStain;
+    private String stainComboName;
 
     /**
      * This function converts pixel intensity values to their absorption counterparts, or optical density values.
      * <p>
-     * It converts all values between 0 and 255 according to a logarithmical curve. See
+     * It converts all values between 0 and 255 according to a logarithmic curve. See
      * testAbsorptionLookupPerformsAsComputation to see the original formula for coming up with the numbers
      *
-     * @param colorValue the unsigned byte colorvalue of a specific pixel, so between 0 and 255
-     * @return logarothmically redistributed value
+     * @param colorValue the unsigned byte color value of a specific pixel, so between 0 and 255
+     * @return logarithmically redistributed value
      */
     static double convertIntensityToAbsorption(int colorValue) {
         return intensityToAbsorptionLookup[colorValue];
     }
 
-    private void initializeColorTables(ImgPlus<UnsignedByteType>[] outputImages) {
+    /**
+     * Initialize this stain matrix from a set of specified Stain and Channel values. These values represent vectors
+     * of optical densities. The vectors need not be normalized as that is done by the computation.
+     *
+     * @param stainComboName name of the combination of the 3 stains together, such as "hematoxylin, eosin and DAB"
+     * @param stain1R        Red channel optical density for stain 1
+     * @param stain1G        Green channel optical density for stain 1
+     * @param stain1B        Blue channel optical density for stain 1
+     * @param stain2R        Red channel optical density for stain 2
+     * @param stain2G        Green channel optical density for stain 2
+     * @param stain2B        Blue channel optical density for stain 2
+     * @param stain3R        Red channel optical density for stain 3
+     * @param stain3G        Green channel optical density for stain 3
+     * @param stain3B        Blue channel optical density for stain 3
+     */
+    public void init(String stainComboName, double stain1R, double stain1G, double stain1B,
+                     double stain2R, double stain2G, double stain2B,
+                     double stain3R, double stain3G, double stain3B) {
+        this.stainComboName = stainComboName;
+        opticalDensitiesStain1[R] = stain1R;
+        opticalDensitiesStain1[G] = stain1G;
+        opticalDensitiesStain1[B] = stain1B;
+        opticalDensitiesStain2[R] = stain2R;
+        opticalDensitiesStain2[G] = stain2G;
+        opticalDensitiesStain2[B] = stain2B;
+        opticalDensitiesStain3[R] = stain3R;
+        opticalDensitiesStain3[G] = stain3G;
+        opticalDensitiesStain3[B] = stain3B;
+    }
 
-        for (int imageNumber = 0; imageNumber < 3; imageNumber++) {
-            byte[] rLUT = new byte[256];
-            byte[] gLUT = new byte[256];
-            byte[] bLUT = new byte[256];
-            for (int j = 0; j < 256; j++) { //LUT[1]
-                rLUT[255 - j] = (byte) (255.0 - (double) j * normOD[imageNumber][0]);
-                gLUT[255 - j] = (byte) (255.0 - (double) j * normOD[imageNumber][1]);
-                bLUT[255 - j] = (byte) (255.0 - (double) j * normOD[imageNumber][2]);
-            }
-            outputImages[imageNumber].initializeColorTables(1);
-            final ColorTable8 colorTable8 = new ColorTable8(rLUT, gLUT, bLUT);
-            outputImages[imageNumber].setColorTable(colorTable8, 0);
+    /**
+     * This method intended to initialize the stain matrix from a configuration file
+     *
+     * @param line String in the format of STAIN_COMBO_NAME,R,G,B,R,G,B,R,G,B
+     */
+    public void init(String line) {
+        String[] parts = line.split(Pattern.quote(","));
+        if (parts.length == 10) {
+            stainComboName = parts[0].replaceAll("\\s+$", "");
+            opticalDensitiesStain1[R] = Double.parseDouble(parts[1].replaceAll("\\s+$", ""));
+            opticalDensitiesStain1[G] = Double.parseDouble(parts[2].replaceAll("\\s+$", ""));
+            opticalDensitiesStain1[B] = Double.parseDouble(parts[3].replaceAll("\\s+$", ""));
+            opticalDensitiesStain2[R] = Double.parseDouble(parts[4].replaceAll("\\s+$", ""));
+            opticalDensitiesStain2[G] = Double.parseDouble(parts[5].replaceAll("\\s+$", ""));
+            opticalDensitiesStain2[B] = Double.parseDouble(parts[6].replaceAll("\\s+$", ""));
+            opticalDensitiesStain3[R] = Double.parseDouble(parts[7].replaceAll("\\s+$", ""));
+            opticalDensitiesStain3[G] = Double.parseDouble(parts[8].replaceAll("\\s+$", ""));
+            opticalDensitiesStain3[B] = Double.parseDouble(parts[9].replaceAll("\\s+$", ""));
         }
     }
 
@@ -380,47 +414,80 @@ public class StainMatrixIJ2 {
         return outputImages;
     }
 
-    public void init(String line) {
-        String[] parts = line.split(Pattern.quote(","));
-        if (parts.length == 10) {
-            myStain = parts[0].replaceAll("\\s+$", "");
-            opticalDensitiesStain1[R] = Double.parseDouble(parts[1].replaceAll("\\s+$", ""));
-            opticalDensitiesStain1[G] = Double.parseDouble(parts[2].replaceAll("\\s+$", ""));
-            opticalDensitiesStain1[B] = Double.parseDouble(parts[3].replaceAll("\\s+$", ""));
-            opticalDensitiesStain2[R] = Double.parseDouble(parts[4].replaceAll("\\s+$", ""));
-            opticalDensitiesStain2[G] = Double.parseDouble(parts[5].replaceAll("\\s+$", ""));
-            opticalDensitiesStain2[B] = Double.parseDouble(parts[6].replaceAll("\\s+$", ""));
-            opticalDensitiesStain3[R] = Double.parseDouble(parts[7].replaceAll("\\s+$", ""));
-            opticalDensitiesStain3[G] = Double.parseDouble(parts[8].replaceAll("\\s+$", ""));
-            opticalDensitiesStain3[B] = Double.parseDouble(parts[9].replaceAll("\\s+$", ""));
-        }
-    }
-
-    public void init(String stainComboName, double x0, double y0, double z0,
-                     double x1, double y1, double z1,
-                     double x2, double y2, double z2) {
-        myStain = stainComboName;
-        opticalDensitiesStain1[R] = x0;
-        opticalDensitiesStain1[G] = y0;
-        opticalDensitiesStain1[B] = z0;
-        opticalDensitiesStain2[R] = x1;
-        opticalDensitiesStain2[G] = y1;
-        opticalDensitiesStain2[B] = z1;
-        opticalDensitiesStain3[R] = x2;
-        opticalDensitiesStain3[G] = y2;
-        opticalDensitiesStain3[B] = z2;
-    }
-
-    protected double[] initComputation(boolean doIshow) {
+    private double[] initComputation(boolean showLog) {
 
         normalizeVectorLengths();
 
         reset2ndStainWhenUnspecified();
-        reset3rdStainWhenUnspecified(doIshow);
+        reset3rdStainWhenUnspecified(showLog);
 
         initMatrixToPreventDivisionByZero();
 
         return buildInvertMatrix();
+    }
+
+    /**
+     * This method normalizes the vector length of all optical density vectors.
+     *
+     * @see <a href="https://en.wikipedia.org/wiki/Unit_vector">Wikipedia definition of a normalized vector</a>
+     */
+    private void normalizeVectorLengths() {
+        normalizeVectorLength(normOD[STAIN1], opticalDensitiesStain1);
+        normalizeVectorLength(normOD[STAIN2], opticalDensitiesStain2);
+        normalizeVectorLength(normOD[STAIN3], opticalDensitiesStain3);
+    }
+
+    /**
+     * This method normalizes the vector length of an optical density vector.
+     *
+     * @param normODColor the normalized vector of optical densities for a color
+     * @param oDColor     the vector of optical densities to normalize
+     * @see <a href="https://en.wikipedia.org/wiki/Unit_vector">Wikipedia definition of a normalized vector</a>
+     */
+    private void normalizeVectorLength(double[] normODColor, double[] oDColor) {
+        double length = Math.sqrt(oDColor[R] * oDColor[R] + oDColor[G] * oDColor[G] + oDColor[B] * oDColor[B]);
+        if (length != 0.0) {
+            normODColor[R] = oDColor[R] / length;
+            normODColor[G] = oDColor[G] / length;
+            normODColor[B] = oDColor[B] / length;
+        } else {
+            normODColor[0] = normODColor[1] = normODColor[2] = 0.0;
+        }
+    }
+
+    private void reset2ndStainWhenUnspecified() {
+        if (normOD[STAIN2][R] == 0.0 && normOD[STAIN2][G] == 0.0 && normOD[STAIN2][B] == 0.0) {
+            normOD[STAIN2][R] = normOD[STAIN1][B];
+            normOD[STAIN2][G] = normOD[STAIN1][R];
+            normOD[STAIN2][B] = normOD[STAIN1][G];
+        }
+    }
+
+    private void reset3rdStainWhenUnspecified(boolean showLog) {
+        if (normOD[STAIN3][R] == 0.0 && normOD[STAIN3][G] == 0.0 && normOD[STAIN3][B] == 0.0) {
+            determineChannelOfColor3(showLog, 0);
+            determineChannelOfColor3(showLog, 1);
+            determineChannelOfColor3(showLog, 2);
+
+            normalizeVectorLength(normOD[STAIN3], normOD[STAIN3]);
+        }
+    }
+
+    /**
+     * This method determines the specified optical density for a channel when color 3 was unspecified
+     *
+     * @param showLog boolean value that determines whether logging should be done
+     * @param channel the channel to determine the OD for
+     */
+    private void determineChannelOfColor3(boolean showLog, int channel) {
+        if ((normOD[STAIN1][channel] * normOD[STAIN1][channel] +
+                normOD[STAIN2][channel] * normOD[STAIN2][channel]) > 1) {
+            if (showLog)
+                IJ.log("Color_3 has a negative component in channel " + channel);
+            normOD[STAIN3][channel] = 0.0;
+        } else {
+            normOD[STAIN3][channel] = Math.sqrt(1.0 - (normOD[STAIN1][channel] * normOD[STAIN1][channel]) - (normOD[STAIN2][channel] * normOD[STAIN2][channel]));
+        }
     }
 
     private void initMatrixToPreventDivisionByZero() {
@@ -457,67 +524,20 @@ public class StainMatrixIJ2 {
         return q;
     }
 
-    private void reset3rdStainWhenUnspecified(boolean doIshow) {
-        if (normOD[STAIN3][R] == 0.0 && normOD[STAIN3][G] == 0.0 && normOD[STAIN3][B] == 0.0) {
-            determineChannelOfColor3(doIshow, 0);
-            determineChannelOfColor3(doIshow, 1);
-            determineChannelOfColor3(doIshow, 2);
+    private void initializeColorTables(ImgPlus<UnsignedByteType>[] outputImages) {
 
-            normalizeVectorLength(normOD[STAIN3], normOD[STAIN3]);
-        }
-    }
-
-    /**
-     * This method determines the specified optical density for a channel when color 3 was unspecified
-     *
-     * @param doIshow boolean value that determines whether logging should be done
-     * @param channel the channel to determine the OD for
-     */
-    private void determineChannelOfColor3(boolean doIshow, int channel) {
-        if ((normOD[STAIN1][channel] * normOD[STAIN1][channel] +
-                normOD[STAIN2][channel] * normOD[STAIN2][channel]) > 1) {
-            if (doIshow)
-                IJ.log("Color_3 has a negative component in channel " + channel);
-            normOD[STAIN3][channel] = 0.0;
-        } else {
-            normOD[STAIN3][channel] = Math.sqrt(1.0 - (normOD[STAIN1][channel] * normOD[STAIN1][channel]) - (normOD[STAIN2][channel] * normOD[STAIN2][channel]));
-        }
-    }
-
-    private void reset2ndStainWhenUnspecified() {
-        if (normOD[STAIN2][R] == 0.0 && normOD[STAIN2][G] == 0.0 && normOD[STAIN2][B] == 0.0) {
-            normOD[STAIN2][R] = normOD[STAIN1][B];
-            normOD[STAIN2][G] = normOD[STAIN1][R];
-            normOD[STAIN2][B] = normOD[STAIN1][G];
-        }
-    }
-
-    /**
-     * This method normalizes the vector length of all optical density vectors.
-     *
-     * @see <a href="https://en.wikipedia.org/wiki/Unit_vector">Wikipedia definition of a normalized vector</a>
-     */
-    private void normalizeVectorLengths() {
-        normalizeVectorLength(normOD[STAIN1], opticalDensitiesStain1);
-        normalizeVectorLength(normOD[STAIN2], opticalDensitiesStain2);
-        normalizeVectorLength(normOD[STAIN3], opticalDensitiesStain3);
-    }
-
-    /**
-     * This method normalizes the vector length of an optical density vector.
-     *
-     * @param normODColor the normalized vector of optical densities for a color
-     * @param oDColor     the vector of optical densities to normalize
-     * @see <a href="https://en.wikipedia.org/wiki/Unit_vector">Wikipedia definition of a normalized vector</a>
-     */
-    private void normalizeVectorLength(double[] normODColor, double[] oDColor) {
-        double length = Math.sqrt(oDColor[R] * oDColor[R] + oDColor[G] * oDColor[G] + oDColor[B] * oDColor[B]);
-        if (length != 0.0) {
-            normODColor[R] = oDColor[R] / length;
-            normODColor[G] = oDColor[G] / length;
-            normODColor[B] = oDColor[B] / length;
-        } else {
-            normODColor[0] = normODColor[1] = normODColor[2] = 0.0;
+        for (int imageNumber = 0; imageNumber < 3; imageNumber++) {
+            byte[] rLUT = new byte[256];
+            byte[] gLUT = new byte[256];
+            byte[] bLUT = new byte[256];
+            for (int j = 0; j < 256; j++) { //LUT[1]
+                rLUT[255 - j] = (byte) (255.0 - (double) j * normOD[imageNumber][0]);
+                gLUT[255 - j] = (byte) (255.0 - (double) j * normOD[imageNumber][1]);
+                bLUT[255 - j] = (byte) (255.0 - (double) j * normOD[imageNumber][2]);
+            }
+            outputImages[imageNumber].initializeColorTables(1);
+            final ColorTable8 colorTable8 = new ColorTable8(rLUT, gLUT, bLUT);
+            outputImages[imageNumber].setColorTable(colorTable8, 0);
         }
     }
 }
