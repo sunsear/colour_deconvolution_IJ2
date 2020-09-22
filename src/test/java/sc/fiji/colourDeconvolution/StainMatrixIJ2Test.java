@@ -104,7 +104,7 @@ public class StainMatrixIJ2Test {
     @Test
     public void testLogifyLookupPerformsAsComputation() {
         for (int i = 0; i < 256; i++) {
-            assertEquals(-((255.0 * Math.log((i + 1) / 255.0)) / StainMatrixIJ2.LOG_255), StainMatrixIJ2.logify(i), 0.00001);
+            assertEquals(-((255.0 * Math.log((i + 1) / 255.0)) / Math.log(255.0)), StainMatrixIJ2.convertIntensityToAbsorption(i), 0.00001);
         }
     }
 }

@@ -25,7 +25,7 @@ public class StainMatrixIJ2 {
 
     //This lookup outperforms doing an actual calculation by a lot. Since we only have 256 possible values, this is
     //acceptable
-    private static final double[] LOGIFY_LOOKUP = {
+    private static final double[] intensityToAbsorptionLookup = {
             255.0,
             223.10248608420363,
             204.44363657723153,
@@ -282,23 +282,26 @@ public class StainMatrixIJ2 {
             0.18081903477543204,
             -0.0,
             -0.1801113263710012};
-    protected double[] cosx = new double[3];
-    protected double[] cosy = new double[3];
-    protected double[] cosz = new double[3];
-    double[] MODx = new double[3];
-    double[] MODy = new double[3];
-    double[] MODz = new double[3];
+    protected double[] cosOfcoFactorx = new double[3];
+    protected double[] cosOfcoFactory = new double[3];
+    protected double[] cosOfcoFactorz = new double[3];
+
+    double[] opticalDensitiesColour1 = new double[3];
+    double[] opticalDensitiesColour2 = new double[3];
+    double[] opticalDensitiesColour3 = new double[3];
     String myStain;
 
     /**
-     * This function converts all values between 0 and 255 according to a logarithmical curve. See testLogify to
+     * This function converts pixel intensity values to their absorption counterparts, or optical density values.
+     * <p>
+     * It converts all values between 0 and 255 according to a logarithmical curve. See testLogify to
      * see the distribution of the numbers
      *
      * @param colourValue the unsigned byte colourvalue of a specific pixel, so between 0 and 255
      * @return logarothmically redistributed value
      */
-    static double logify(int colourValue) {
-        return LOGIFY_LOOKUP[colourValue];
+    static double convertIntensityToAbsorption(int colourValue) {
+        return intensityToAbsorptionLookup[colourValue];
     }
 
     private void initializeColorTables(ImgPlus<UnsignedByteType>[] outputImages) {
@@ -308,9 +311,9 @@ public class StainMatrixIJ2 {
             byte[] gLUT = new byte[256];
             byte[] bLUT = new byte[256];
             for (int j = 0; j < 256; j++) { //LUT[1]
-                rLUT[255 - j] = (byte) (255.0 - (double) j * cosx[imageNumber]);
-                gLUT[255 - j] = (byte) (255.0 - (double) j * cosy[imageNumber]);
-                bLUT[255 - j] = (byte) (255.0 - (double) j * cosz[imageNumber]);
+                rLUT[255 - j] = (byte) (255.0 - (double) j * cosOfcoFactorx[imageNumber]);
+                gLUT[255 - j] = (byte) (255.0 - (double) j * cosOfcoFactory[imageNumber]);
+                bLUT[255 - j] = (byte) (255.0 - (double) j * cosOfcoFactorz[imageNumber]);
             }
             outputImages[imageNumber].initializeColorTables(1);
             final ColorTable8 colorTable8 = new ColorTable8(rLUT, gLUT, bLUT);
@@ -342,19 +345,19 @@ public class StainMatrixIJ2 {
                 (input, out1, out2, out3) -> {
                     int rgba = input.get();
 
-                    double rLog = LOGIFY_LOOKUP[ARGBType.red(rgba)];
-                    double gLog = LOGIFY_LOOKUP[ARGBType.green(rgba)];
-                    double bLog = LOGIFY_LOOKUP[ARGBType.blue(rgba)];
+                    double absorbedR = convertIntensityToAbsorption(ARGBType.red(rgba));
+                    double absorbedG = convertIntensityToAbsorption(ARGBType.green(rgba));
+                    double absorbedB = convertIntensityToAbsorption(ARGBType.blue(rgba));
 
                     // Rescale to match original paper values
-                    double output = Math.exp(-((rLog * q[0] + gLog * q[1] + bLog * q[2]) - 255.0) * LOG_255 / 255.0);
-                    out1.set(output > 255 ? 255 : (int) Math.round(output));
+                    double intensityColor1 = Math.exp(-((absorbedR * q[0] + absorbedG * q[1] + absorbedB * q[2]) - 255.0) * LOG_255 / 255.0);
+                    out1.set(intensityColor1 > 255 ? 255 : (int) Math.round(intensityColor1));
 
-                    output = Math.exp(-((rLog * q[3] + gLog * q[4] + bLog * q[5]) - 255.0) * LOG_255 / 255.0);
-                    out2.set(output > 255 ? 255 : (int) Math.round(output));
+                    double intensityColor2 = Math.exp(-((absorbedR * q[3] + absorbedG * q[4] + absorbedB * q[5]) - 255.0) * LOG_255 / 255.0);
+                    out2.set(intensityColor2 > 255 ? 255 : (int) Math.round(intensityColor2));
 
-                    output = Math.exp(-((rLog * q[6] + gLog * q[7] + bLog * q[8]) - 255.0) * LOG_255 / 255.0);
-                    out3.set(output > 255 ? 255 : (int) Math.round(output));
+                    double intensityColor3 = Math.exp(-((absorbedR * q[6] + absorbedG * q[7] + absorbedB * q[8]) - 255.0) * LOG_255 / 255.0);
+                    out3.set(intensityColor3 > 255 ? 255 : (int) Math.round(intensityColor3));
                 }
         );
 
@@ -371,15 +374,15 @@ public class StainMatrixIJ2 {
         String[] parts = line.split(Pattern.quote(","));
         if (parts.length == 10) {
             myStain = parts[0].replaceAll("\\s+$", "");
-            MODx[0] = Double.parseDouble(parts[1].replaceAll("\\s+$", ""));
-            MODy[0] = Double.parseDouble(parts[2].replaceAll("\\s+$", ""));
-            MODz[0] = Double.parseDouble(parts[3].replaceAll("\\s+$", ""));
-            MODx[1] = Double.parseDouble(parts[4].replaceAll("\\s+$", ""));
-            MODy[1] = Double.parseDouble(parts[5].replaceAll("\\s+$", ""));
-            MODz[1] = Double.parseDouble(parts[6].replaceAll("\\s+$", ""));
-            MODx[2] = Double.parseDouble(parts[7].replaceAll("\\s+$", ""));
-            MODy[2] = Double.parseDouble(parts[8].replaceAll("\\s+$", ""));
-            MODz[2] = Double.parseDouble(parts[9].replaceAll("\\s+$", ""));
+            opticalDensitiesColour1[0] = Double.parseDouble(parts[1].replaceAll("\\s+$", ""));
+            opticalDensitiesColour1[1] = Double.parseDouble(parts[2].replaceAll("\\s+$", ""));
+            opticalDensitiesColour1[2] = Double.parseDouble(parts[3].replaceAll("\\s+$", ""));
+            opticalDensitiesColour2[0] = Double.parseDouble(parts[4].replaceAll("\\s+$", ""));
+            opticalDensitiesColour2[1] = Double.parseDouble(parts[5].replaceAll("\\s+$", ""));
+            opticalDensitiesColour2[2] = Double.parseDouble(parts[6].replaceAll("\\s+$", ""));
+            opticalDensitiesColour3[0] = Double.parseDouble(parts[7].replaceAll("\\s+$", ""));
+            opticalDensitiesColour3[1] = Double.parseDouble(parts[8].replaceAll("\\s+$", ""));
+            opticalDensitiesColour3[2] = Double.parseDouble(parts[9].replaceAll("\\s+$", ""));
         }
     }
 
@@ -387,135 +390,132 @@ public class StainMatrixIJ2 {
                      double x1, double y1, double z1,
                      double x2, double y2, double z2) {
         myStain = stainName;
-        MODx[0] = x0;
-        MODy[0] = y0;
-        MODz[0] = z0;
-        MODx[1] = x1;
-        MODy[1] = y1;
-        MODz[1] = z1;
-        MODx[2] = x2;
-        MODy[2] = y2;
-        MODz[2] = z2;
-    }
-
-    public double[] getMODx() {
-        return MODx;
-    }
-
-    public void setMODx(double[] mODx) {
-        MODx = mODx;
-    }
-
-    public double[] getMODy() {
-        return MODy;
-    }
-
-    public void setMODy(double[] mODy) {
-        MODy = mODy;
-    }
-
-    public double[] getMODz() {
-        return MODz;
-    }
-
-    public void setMODz(double[] mODz) {
-        MODz = mODz;
+        opticalDensitiesColour1[0] = x0;
+        opticalDensitiesColour1[1] = y0;
+        opticalDensitiesColour1[2] = z0;
+        opticalDensitiesColour2[0] = x1;
+        opticalDensitiesColour2[1] = y1;
+        opticalDensitiesColour2[2] = z1;
+        opticalDensitiesColour3[0] = x2;
+        opticalDensitiesColour3[1] = y2;
+        opticalDensitiesColour3[2] = z2;
     }
 
     protected double[] initComputation(boolean doIshow) {
-        double leng;
 
         normalizeVectorLength();
 
         reset2ndColourWhenUnspecified();
         reset3rdColourWhenUnspecified(doIshow);
 
-        leng = Math.sqrt(cosx[2] * cosx[2] + cosy[2] * cosy[2] + cosz[2] * cosz[2]);
-        cosx[2] = cosx[2] / leng;
-        cosy[2] = cosy[2] / leng;
-        cosz[2] = cosz[2] / leng;
-
-        for (int i = 0; i < 3; i++) {
-            if (cosx[i] == 0.0) cosx[i] = 0.001;
-            if (cosy[i] == 0.0) cosy[i] = 0.001;
-            if (cosz[i] == 0.0) cosz[i] = 0.001;
-        }
+        initMatrixToPreventDivisionByZero();
 
         return buildInvertMatrix();
+    }
+
+    private void initMatrixToPreventDivisionByZero() {
+        for (int i = 0; i < 3; i++) {
+            if (cosOfcoFactorx[i] == 0.0) cosOfcoFactorx[i] = 0.001;
+            if (cosOfcoFactory[i] == 0.0) cosOfcoFactory[i] = 0.001;
+            if (cosOfcoFactorz[i] == 0.0) cosOfcoFactorz[i] = 0.001;
+        }
     }
 
     private double[] buildInvertMatrix() {
         double[] q = new double[9];
         double A, V, C;
-        A = cosy[1] - cosx[1] * cosy[0] / cosx[0];
-        V = cosz[1] - cosx[1] * cosz[0] / cosx[0];
-        C = cosz[2] - cosy[2] * V / A + cosx[2] * (V / A * cosy[0] / cosx[0] - cosz[0] / cosx[0]);
-        q[2] = (-cosx[2] / cosx[0] - cosx[2] / A * cosx[1] / cosx[0] * cosy[0] / cosx[0] + cosy[2] / A * cosx[1] / cosx[0]) / C;
-        q[1] = -q[2] * V / A - cosx[1] / (cosx[0] * A);
-        q[0] = 1.0 / cosx[0] - q[1] * cosy[0] / cosx[0] - q[2] * cosz[0] / cosx[0];
-        q[5] = (-cosy[2] / A + cosx[2] / A * cosy[0] / cosx[0]) / C;
+        A = cosOfcoFactory[1] - cosOfcoFactorx[1] * cosOfcoFactory[0] / cosOfcoFactorx[0];
+        V = cosOfcoFactorz[1] - cosOfcoFactorx[1] * cosOfcoFactorz[0] / cosOfcoFactorx[0];
+        C = cosOfcoFactorz[2] - cosOfcoFactory[2] * V / A + cosOfcoFactorx[2] * (V / A * cosOfcoFactory[0] / cosOfcoFactorx[0] - cosOfcoFactorz[0] / cosOfcoFactorx[0]);
+        q[2] = (-cosOfcoFactorx[2] / cosOfcoFactorx[0] - cosOfcoFactorx[2] / A * cosOfcoFactorx[1] / cosOfcoFactorx[0] * cosOfcoFactory[0] / cosOfcoFactorx[0] + cosOfcoFactory[2] / A * cosOfcoFactorx[1] / cosOfcoFactorx[0]) / C;
+        q[1] = -q[2] * V / A - cosOfcoFactorx[1] / (cosOfcoFactorx[0] * A);
+        q[0] = 1.0 / cosOfcoFactorx[0] - q[1] * cosOfcoFactory[0] / cosOfcoFactorx[0] - q[2] * cosOfcoFactorz[0] / cosOfcoFactorx[0];
+        q[5] = (-cosOfcoFactory[2] / A + cosOfcoFactorx[2] / A * cosOfcoFactory[0] / cosOfcoFactorx[0]) / C;
         q[4] = -q[5] * V / A + 1.0 / A;
-        q[3] = -q[4] * cosy[0] / cosx[0] - q[5] * cosz[0] / cosx[0];
+        q[3] = -q[4] * cosOfcoFactory[0] / cosOfcoFactorx[0] - q[5] * cosOfcoFactorz[0] / cosOfcoFactorx[0];
         q[8] = 1.0 / C;
         q[7] = -q[8] * V / A;
-        q[6] = -q[7] * cosy[0] / cosx[0] - q[8] * cosz[0] / cosx[0];
+        q[6] = -q[7] * cosOfcoFactory[0] / cosOfcoFactorx[0] - q[8] * cosOfcoFactorz[0] / cosOfcoFactorx[0];
         return q;
     }
 
     private void reset3rdColourWhenUnspecified(boolean doIshow) {
-        if (cosx[2] == 0.0) { // 3rd colour is unspecified
-            if (cosy[2] == 0.0) {
-                if (cosz[2] == 0.0) {
-                    if ((cosx[0] * cosx[0] + cosx[1] * cosx[1]) > 1) {
+        if (cosOfcoFactorx[2] == 0.0) { // 3rd colour is unspecified
+            if (cosOfcoFactory[2] == 0.0) {
+                if (cosOfcoFactorz[2] == 0.0) {
+                    if ((cosOfcoFactorx[0] * cosOfcoFactorx[0] + cosOfcoFactorx[1] * cosOfcoFactorx[1]) > 1) {
                         if (doIshow)
                             IJ.log("Colour_3 has a negative R component.");
-                        cosx[2] = 0.0;
+                        cosOfcoFactorx[2] = 0.0;
                     } else
-                        cosx[2] = Math.sqrt(1.0 - (cosx[0] * cosx[0]) - (cosx[1] * cosx[1]));
+                        cosOfcoFactorx[2] = Math.sqrt(1.0 - (cosOfcoFactorx[0] * cosOfcoFactorx[0]) - (cosOfcoFactorx[1] * cosOfcoFactorx[1]));
 
-                    if ((cosy[0] * cosy[0] + cosy[1] * cosy[1]) > 1) {
+                    if ((cosOfcoFactory[0] * cosOfcoFactory[0] + cosOfcoFactory[1] * cosOfcoFactory[1]) > 1) {
                         if (doIshow)
                             IJ.log("Colour_3 has a negative G component.");
-                        cosy[2] = 0.0;
+                        cosOfcoFactory[2] = 0.0;
                     } else {
-                        cosy[2] = Math.sqrt(1.0 - (cosy[0] * cosy[0]) - (cosy[1] * cosy[1]));
+                        cosOfcoFactory[2] = Math.sqrt(1.0 - (cosOfcoFactory[0] * cosOfcoFactory[0]) - (cosOfcoFactory[1] * cosOfcoFactory[1]));
                     }
 
-                    if ((cosz[0] * cosz[0] + cosz[1] * cosz[1]) > 1) {
+                    if ((cosOfcoFactorz[0] * cosOfcoFactorz[0] + cosOfcoFactorz[1] * cosOfcoFactorz[1]) > 1) {
                         if (doIshow)
                             IJ.log("Colour_3 has a negative B component.");
-                        cosz[2] = 0.0;
+                        cosOfcoFactorz[2] = 0.0;
                     } else {
-                        cosz[2] = Math.sqrt(1.0 - (cosz[0] * cosz[0]) - (cosz[1] * cosz[1]));
+                        cosOfcoFactorz[2] = Math.sqrt(1.0 - (cosOfcoFactorz[0] * cosOfcoFactorz[0]) - (cosOfcoFactorz[1] * cosOfcoFactorz[1]));
                     }
                 }
             }
         }
+        //is dit dubbel op
+        double leng = Math.sqrt(cosOfcoFactorx[2] * cosOfcoFactorx[2] + cosOfcoFactory[2] * cosOfcoFactory[2] + cosOfcoFactorz[2] * cosOfcoFactorz[2]);
+        cosOfcoFactorx[2] = cosOfcoFactorx[2] / leng;
+        cosOfcoFactory[2] = cosOfcoFactory[2] / leng;
+        cosOfcoFactorz[2] = cosOfcoFactorz[2] / leng;
     }
 
     private void reset2ndColourWhenUnspecified() {
-        if (cosx[1] == 0.0) { //2nd colour is unspecified
-            if (cosy[1] == 0.0) {
-                if (cosz[1] == 0.0) {
-                    cosx[1] = cosz[0];
-                    cosy[1] = cosx[0];
-                    cosz[1] = cosy[0];
+        if (cosOfcoFactorx[1] == 0.0) { //2nd colour is unspecified
+            if (cosOfcoFactory[1] == 0.0) {
+                if (cosOfcoFactorz[1] == 0.0) {
+                    cosOfcoFactorx[1] = cosOfcoFactorz[0];
+                    cosOfcoFactory[1] = cosOfcoFactorx[0];
+                    cosOfcoFactorz[1] = cosOfcoFactory[0];
                 }
             }
         }
     }
 
     private void normalizeVectorLength() {
-        double[] len = new double[3];
-        for (int i = 0; i < 3; i++) {
-            // Normalise vector length
-            cosx[i] = cosy[i] = cosz[i] = 0.0;
-            len[i] = Math.sqrt(MODx[i] * MODx[i] + MODy[i] * MODy[i] + MODz[i] * MODz[i]);
-            if (len[i] != 0.0) {
-                cosx[i] = MODx[i] / len[i];
-                cosy[i] = MODy[i] / len[i];
-                cosz[i] = MODz[i] / len[i];
-            }
+        cosOfcoFactorx[0] = cosOfcoFactory[0] = cosOfcoFactorz[0] = 0.0;
+        double len = Math.sqrt(opticalDensitiesColour1[0] * opticalDensitiesColour1[0] +
+                opticalDensitiesColour1[1] * opticalDensitiesColour1[1] +
+                opticalDensitiesColour1[2] * opticalDensitiesColour1[2]);
+        if (len != 0.0) {
+            cosOfcoFactorx[0] = opticalDensitiesColour1[0] / len;
+            cosOfcoFactory[0] = opticalDensitiesColour1[1] / len;
+            cosOfcoFactorz[0] = opticalDensitiesColour1[2] / len;
+        }
+
+        cosOfcoFactorx[1] = cosOfcoFactory[1] = cosOfcoFactorz[1] = 0.0;
+        len = Math.sqrt(opticalDensitiesColour2[0] * opticalDensitiesColour2[0] +
+                opticalDensitiesColour2[1] * opticalDensitiesColour2[1] +
+                opticalDensitiesColour2[2] * opticalDensitiesColour2[2]);
+        if (len != 0.0) {
+            cosOfcoFactorx[1] = opticalDensitiesColour2[0] / len;
+            cosOfcoFactory[1] = opticalDensitiesColour2[1] / len;
+            cosOfcoFactorz[1] = opticalDensitiesColour2[2] / len;
+        }
+
+        cosOfcoFactorx[2] = cosOfcoFactory[2] = cosOfcoFactorz[2] = 0.0;
+        len = Math.sqrt(opticalDensitiesColour3[0] * opticalDensitiesColour3[0] +
+                opticalDensitiesColour3[1] * opticalDensitiesColour3[1] +
+                opticalDensitiesColour3[2] * opticalDensitiesColour3[2]);
+        if (len != 0.0) {
+            cosOfcoFactorx[2] = opticalDensitiesColour3[0] / len;
+            cosOfcoFactory[2] = opticalDensitiesColour3[1] / len;
+            cosOfcoFactorz[2] = opticalDensitiesColour3[2] / len;
         }
     }
 }
