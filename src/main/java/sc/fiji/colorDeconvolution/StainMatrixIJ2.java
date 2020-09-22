@@ -495,7 +495,7 @@ public class StainMatrixIJ2 {
     /**
      * This method normalizes the vector length of all optical density vectors.
      *
-     * @see <a href="https://en.wikipedia.org/wiki/Unit_vector">Wikipedia definition of normalizing a vector</a>
+     * @see <a href="https://en.wikipedia.org/wiki/Unit_vector">Wikipedia definition of a normalized vector</a>
      */
     private void normalizeVectorLengths() {
         normalizeVectorLength(normOD[STAIN1], opticalDensitiesStain1);
@@ -508,14 +508,14 @@ public class StainMatrixIJ2 {
      *
      * @param normODColor the normalized vector of optical densities for a color
      * @param oDColor     the vector of optical densities to normalize
-     * @see <a href="https://en.wikipedia.org/wiki/Unit_vector">Wikipedia definition of normalizing a vector</a>
+     * @see <a href="https://en.wikipedia.org/wiki/Unit_vector">Wikipedia definition of a normalized vector</a>
      */
     private void normalizeVectorLength(double[] normODColor, double[] oDColor) {
-        double len = Math.sqrt(oDColor[R] * oDColor[R] + oDColor[G] * oDColor[G] + oDColor[B] * oDColor[B]);
-        if (len != 0.0) {
-            normODColor[R] = oDColor[R] / len;
-            normODColor[G] = oDColor[G] / len;
-            normODColor[B] = oDColor[B] / len;
+        double length = Math.sqrt(oDColor[R] * oDColor[R] + oDColor[G] * oDColor[G] + oDColor[B] * oDColor[B]);
+        if (length != 0.0) {
+            normODColor[R] = oDColor[R] / length;
+            normODColor[G] = oDColor[G] / length;
+            normODColor[B] = oDColor[B] / length;
         } else {
             normODColor[0] = normODColor[1] = normODColor[2] = 0.0;
         }
