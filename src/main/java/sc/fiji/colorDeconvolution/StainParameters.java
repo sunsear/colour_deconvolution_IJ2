@@ -1,6 +1,25 @@
-package sc.fiji.colourDeconvolution;
+package sc.fiji.colorDeconvolution;
 
-import static sc.fiji.colourDeconvolution.StainParameters.Constants.*;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.ALC_B_H_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.A_Z_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.CMY_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.DAB_MATRIX;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.FLG_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.FR_FB_DAB_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.GIEMSA_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.GL_EOS_MATRIX;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.GL_HAEM_MATRIX;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.HAEM_MATRIX;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.H_AEC_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.H_DAB_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.H_E2_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.H_E_DAB_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.H_E_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.H_PAS_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.MAS_TRI_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.MG_DAB_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.RGB_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.ZERO_MATRIX;
 
 public enum StainParameters {
     H_E(H_E_DESCR, GL_HAEM_MATRIX, GL_EOS_MATRIX, ZERO_MATRIX),

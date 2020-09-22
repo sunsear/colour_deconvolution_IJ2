@@ -1,4 +1,4 @@
-package sc.fiji.colourDeconvolution;
+package sc.fiji.colorDeconvolution;
 
 import java.util.regex.Pattern;
 
@@ -14,7 +14,7 @@ import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
 /**
- * This class performs Colour Deconvolution for ImageJ2. It is based on the excellent work done by Gabriel Landini for
+ * This class performs Color Deconvolution for ImageJ2. It is based on the excellent work done by Gabriel Landini for
  * ImageJ1.
  * <p>
  * For example usage see StainMatrixIJ2Test
@@ -282,26 +282,36 @@ public class StainMatrixIJ2 {
             0.18081903477543204,
             -0.0,
             -0.1801113263710012};
-    protected double[] cosOfcoFactorx = new double[3];
-    protected double[] cosOfcoFactory = new double[3];
-    protected double[] cosOfcoFactorz = new double[3];
 
-    double[] opticalDensitiesColour1 = new double[3];
-    double[] opticalDensitiesColour2 = new double[3];
-    double[] opticalDensitiesColour3 = new double[3];
+    public static final int STAIN1 = 0;
+    public static final int STAIN2 = 1;
+    public static final int STAIN3 = 2;
+
+    public static final int R = 0;
+    public static final int G = 1;
+    public static final int B = 2;
+
+
+    private double[] opticalDensitiesStain1 = new double[3];
+    private double[] opticalDensitiesStain2 = new double[3];
+    private double[] opticalDensitiesStain3 = new double[3];
+
+    //These are the normalized Optical Densities for each color  
+    private double[][] normOD = new double[3][3];
+
     String myStain;
 
     /**
      * This function converts pixel intensity values to their absorption counterparts, or optical density values.
      * <p>
-     * It converts all values between 0 and 255 according to a logarithmical curve. See testLogify to
-     * see the distribution of the numbers
+     * It converts all values between 0 and 255 according to a logarithmical curve. See
+     * testAbsorptionLookupPerformsAsComputation to see the original formula for coming up with the numbers
      *
-     * @param colourValue the unsigned byte colourvalue of a specific pixel, so between 0 and 255
+     * @param colorValue the unsigned byte colorvalue of a specific pixel, so between 0 and 255
      * @return logarothmically redistributed value
      */
-    static double convertIntensityToAbsorption(int colourValue) {
-        return intensityToAbsorptionLookup[colourValue];
+    static double convertIntensityToAbsorption(int colorValue) {
+        return intensityToAbsorptionLookup[colorValue];
     }
 
     private void initializeColorTables(ImgPlus<UnsignedByteType>[] outputImages) {
@@ -311,9 +321,9 @@ public class StainMatrixIJ2 {
             byte[] gLUT = new byte[256];
             byte[] bLUT = new byte[256];
             for (int j = 0; j < 256; j++) { //LUT[1]
-                rLUT[255 - j] = (byte) (255.0 - (double) j * cosOfcoFactorx[imageNumber]);
-                gLUT[255 - j] = (byte) (255.0 - (double) j * cosOfcoFactory[imageNumber]);
-                bLUT[255 - j] = (byte) (255.0 - (double) j * cosOfcoFactorz[imageNumber]);
+                rLUT[255 - j] = (byte) (255.0 - (double) j * normOD[imageNumber][0]);
+                gLUT[255 - j] = (byte) (255.0 - (double) j * normOD[imageNumber][1]);
+                bLUT[255 - j] = (byte) (255.0 - (double) j * normOD[imageNumber][2]);
             }
             outputImages[imageNumber].initializeColorTables(1);
             final ColorTable8 colorTable8 = new ColorTable8(rLUT, gLUT, bLUT);
@@ -323,8 +333,8 @@ public class StainMatrixIJ2 {
 
     /**
      * Compute the Deconvolution images and return an ImgPlus array of three 8-bit
-     * images. If the specimen is stained with a 2 colour scheme (such as H &amp;
-     * E) the 3rd image represents the complimentary of the first two colours
+     * images. If the specimen is stained with a 2 color scheme (such as H &amp;
+     * E) the 3rd image represents the complimentary of the first two colors
      * (i.e. green).
      *
      * @param imp : The ImagePlus that will be deconvolved. RGB only.
@@ -374,39 +384,39 @@ public class StainMatrixIJ2 {
         String[] parts = line.split(Pattern.quote(","));
         if (parts.length == 10) {
             myStain = parts[0].replaceAll("\\s+$", "");
-            opticalDensitiesColour1[0] = Double.parseDouble(parts[1].replaceAll("\\s+$", ""));
-            opticalDensitiesColour1[1] = Double.parseDouble(parts[2].replaceAll("\\s+$", ""));
-            opticalDensitiesColour1[2] = Double.parseDouble(parts[3].replaceAll("\\s+$", ""));
-            opticalDensitiesColour2[0] = Double.parseDouble(parts[4].replaceAll("\\s+$", ""));
-            opticalDensitiesColour2[1] = Double.parseDouble(parts[5].replaceAll("\\s+$", ""));
-            opticalDensitiesColour2[2] = Double.parseDouble(parts[6].replaceAll("\\s+$", ""));
-            opticalDensitiesColour3[0] = Double.parseDouble(parts[7].replaceAll("\\s+$", ""));
-            opticalDensitiesColour3[1] = Double.parseDouble(parts[8].replaceAll("\\s+$", ""));
-            opticalDensitiesColour3[2] = Double.parseDouble(parts[9].replaceAll("\\s+$", ""));
+            opticalDensitiesStain1[R] = Double.parseDouble(parts[1].replaceAll("\\s+$", ""));
+            opticalDensitiesStain1[G] = Double.parseDouble(parts[2].replaceAll("\\s+$", ""));
+            opticalDensitiesStain1[B] = Double.parseDouble(parts[3].replaceAll("\\s+$", ""));
+            opticalDensitiesStain2[R] = Double.parseDouble(parts[4].replaceAll("\\s+$", ""));
+            opticalDensitiesStain2[G] = Double.parseDouble(parts[5].replaceAll("\\s+$", ""));
+            opticalDensitiesStain2[B] = Double.parseDouble(parts[6].replaceAll("\\s+$", ""));
+            opticalDensitiesStain3[R] = Double.parseDouble(parts[7].replaceAll("\\s+$", ""));
+            opticalDensitiesStain3[G] = Double.parseDouble(parts[8].replaceAll("\\s+$", ""));
+            opticalDensitiesStain3[B] = Double.parseDouble(parts[9].replaceAll("\\s+$", ""));
         }
     }
 
-    public void init(String stainName, double x0, double y0, double z0,
+    public void init(String stainComboName, double x0, double y0, double z0,
                      double x1, double y1, double z1,
                      double x2, double y2, double z2) {
-        myStain = stainName;
-        opticalDensitiesColour1[0] = x0;
-        opticalDensitiesColour1[1] = y0;
-        opticalDensitiesColour1[2] = z0;
-        opticalDensitiesColour2[0] = x1;
-        opticalDensitiesColour2[1] = y1;
-        opticalDensitiesColour2[2] = z1;
-        opticalDensitiesColour3[0] = x2;
-        opticalDensitiesColour3[1] = y2;
-        opticalDensitiesColour3[2] = z2;
+        myStain = stainComboName;
+        opticalDensitiesStain1[R] = x0;
+        opticalDensitiesStain1[G] = y0;
+        opticalDensitiesStain1[B] = z0;
+        opticalDensitiesStain2[R] = x1;
+        opticalDensitiesStain2[G] = y1;
+        opticalDensitiesStain2[B] = z1;
+        opticalDensitiesStain3[R] = x2;
+        opticalDensitiesStain3[G] = y2;
+        opticalDensitiesStain3[B] = z2;
     }
 
     protected double[] initComputation(boolean doIshow) {
 
-        normalizeVectorLength();
+        normalizeVectorLengths();
 
-        reset2ndColourWhenUnspecified();
-        reset3rdColourWhenUnspecified(doIshow);
+        reset2ndStainWhenUnspecified();
+        reset3rdStainWhenUnspecified(doIshow);
 
         initMatrixToPreventDivisionByZero();
 
@@ -414,108 +424,100 @@ public class StainMatrixIJ2 {
     }
 
     private void initMatrixToPreventDivisionByZero() {
-        for (int i = 0; i < 3; i++) {
-            if (cosOfcoFactorx[i] == 0.0) cosOfcoFactorx[i] = 0.001;
-            if (cosOfcoFactory[i] == 0.0) cosOfcoFactory[i] = 0.001;
-            if (cosOfcoFactorz[i] == 0.0) cosOfcoFactorz[i] = 0.001;
+        for (int stain = 0; stain < 3; stain++) {
+            for (int channel = 0; channel < 3; channel++) {
+                if (normOD[stain][channel] == 0.0) normOD[stain][channel] = 0.001;
+            }
         }
     }
 
     private double[] buildInvertMatrix() {
         double[] q = new double[9];
         double A, V, C;
-        A = cosOfcoFactory[1] - cosOfcoFactorx[1] * cosOfcoFactory[0] / cosOfcoFactorx[0];
-        V = cosOfcoFactorz[1] - cosOfcoFactorx[1] * cosOfcoFactorz[0] / cosOfcoFactorx[0];
-        C = cosOfcoFactorz[2] - cosOfcoFactory[2] * V / A + cosOfcoFactorx[2] * (V / A * cosOfcoFactory[0] / cosOfcoFactorx[0] - cosOfcoFactorz[0] / cosOfcoFactorx[0]);
-        q[2] = (-cosOfcoFactorx[2] / cosOfcoFactorx[0] - cosOfcoFactorx[2] / A * cosOfcoFactorx[1] / cosOfcoFactorx[0] * cosOfcoFactory[0] / cosOfcoFactorx[0] + cosOfcoFactory[2] / A * cosOfcoFactorx[1] / cosOfcoFactorx[0]) / C;
-        q[1] = -q[2] * V / A - cosOfcoFactorx[1] / (cosOfcoFactorx[0] * A);
-        q[0] = 1.0 / cosOfcoFactorx[0] - q[1] * cosOfcoFactory[0] / cosOfcoFactorx[0] - q[2] * cosOfcoFactorz[0] / cosOfcoFactorx[0];
-        q[5] = (-cosOfcoFactory[2] / A + cosOfcoFactorx[2] / A * cosOfcoFactory[0] / cosOfcoFactorx[0]) / C;
+        A = normOD[STAIN2][G] - normOD[STAIN2][R] * normOD[STAIN1][G] / normOD[STAIN1][R];
+        V = normOD[STAIN2][B] - normOD[STAIN2][R] * normOD[STAIN1][B] / normOD[STAIN1][R];
+        C = normOD[STAIN3][B] -
+                normOD[STAIN3][G] * V / A +
+                normOD[STAIN3][R] * (V / A * normOD[STAIN1][G] / normOD[STAIN1][R] - normOD[STAIN1][B] / normOD[0][R]);
+        q[2] = (-normOD[STAIN3][R] / normOD[STAIN1][R] -
+                normOD[STAIN3][R] / A * normOD[STAIN2][R] / normOD[STAIN1][R] * normOD[STAIN1][G] / normOD[STAIN1][R] +
+                normOD[STAIN3][G] / A * normOD[STAIN2][R] / normOD[STAIN1][R]) / C;
+        q[1] = -q[2] * V / A -
+                normOD[STAIN2][R] / (normOD[STAIN1][R] * A);
+        q[0] = 1.0 / normOD[STAIN1][R] -
+                q[1] * normOD[STAIN1][G] / normOD[STAIN1][R] -
+                q[2] * normOD[STAIN1][B] / normOD[STAIN1][R];
+        q[5] = (-normOD[STAIN3][G] / A +
+                normOD[STAIN3][R] / A * normOD[STAIN1][G] / normOD[STAIN1][R]) / C;
         q[4] = -q[5] * V / A + 1.0 / A;
-        q[3] = -q[4] * cosOfcoFactory[0] / cosOfcoFactorx[0] - q[5] * cosOfcoFactorz[0] / cosOfcoFactorx[0];
+        q[3] = -q[4] * normOD[STAIN1][G] / normOD[STAIN1][R] - q[5] * normOD[STAIN1][B] / normOD[STAIN1][R];
         q[8] = 1.0 / C;
         q[7] = -q[8] * V / A;
-        q[6] = -q[7] * cosOfcoFactory[0] / cosOfcoFactorx[0] - q[8] * cosOfcoFactorz[0] / cosOfcoFactorx[0];
+        q[6] = -q[7] * normOD[STAIN1][G] / normOD[STAIN1][R] - q[8] * normOD[STAIN1][B] / normOD[STAIN1][R];
         return q;
     }
 
-    private void reset3rdColourWhenUnspecified(boolean doIshow) {
-        if (cosOfcoFactorx[2] == 0.0) { // 3rd colour is unspecified
-            if (cosOfcoFactory[2] == 0.0) {
-                if (cosOfcoFactorz[2] == 0.0) {
-                    if ((cosOfcoFactorx[0] * cosOfcoFactorx[0] + cosOfcoFactorx[1] * cosOfcoFactorx[1]) > 1) {
-                        if (doIshow)
-                            IJ.log("Colour_3 has a negative R component.");
-                        cosOfcoFactorx[2] = 0.0;
-                    } else
-                        cosOfcoFactorx[2] = Math.sqrt(1.0 - (cosOfcoFactorx[0] * cosOfcoFactorx[0]) - (cosOfcoFactorx[1] * cosOfcoFactorx[1]));
+    private void reset3rdStainWhenUnspecified(boolean doIshow) {
+        if (normOD[STAIN3][R] == 0.0 && normOD[STAIN3][G] == 0.0 && normOD[STAIN3][B] == 0.0) {
+            determineChannelOfColor3(doIshow, 0);
+            determineChannelOfColor3(doIshow, 1);
+            determineChannelOfColor3(doIshow, 2);
 
-                    if ((cosOfcoFactory[0] * cosOfcoFactory[0] + cosOfcoFactory[1] * cosOfcoFactory[1]) > 1) {
-                        if (doIshow)
-                            IJ.log("Colour_3 has a negative G component.");
-                        cosOfcoFactory[2] = 0.0;
-                    } else {
-                        cosOfcoFactory[2] = Math.sqrt(1.0 - (cosOfcoFactory[0] * cosOfcoFactory[0]) - (cosOfcoFactory[1] * cosOfcoFactory[1]));
-                    }
-
-                    if ((cosOfcoFactorz[0] * cosOfcoFactorz[0] + cosOfcoFactorz[1] * cosOfcoFactorz[1]) > 1) {
-                        if (doIshow)
-                            IJ.log("Colour_3 has a negative B component.");
-                        cosOfcoFactorz[2] = 0.0;
-                    } else {
-                        cosOfcoFactorz[2] = Math.sqrt(1.0 - (cosOfcoFactorz[0] * cosOfcoFactorz[0]) - (cosOfcoFactorz[1] * cosOfcoFactorz[1]));
-                    }
-                }
-            }
-        }
-        //is dit dubbel op
-        double leng = Math.sqrt(cosOfcoFactorx[2] * cosOfcoFactorx[2] + cosOfcoFactory[2] * cosOfcoFactory[2] + cosOfcoFactorz[2] * cosOfcoFactorz[2]);
-        cosOfcoFactorx[2] = cosOfcoFactorx[2] / leng;
-        cosOfcoFactory[2] = cosOfcoFactory[2] / leng;
-        cosOfcoFactorz[2] = cosOfcoFactorz[2] / leng;
-    }
-
-    private void reset2ndColourWhenUnspecified() {
-        if (cosOfcoFactorx[1] == 0.0) { //2nd colour is unspecified
-            if (cosOfcoFactory[1] == 0.0) {
-                if (cosOfcoFactorz[1] == 0.0) {
-                    cosOfcoFactorx[1] = cosOfcoFactorz[0];
-                    cosOfcoFactory[1] = cosOfcoFactorx[0];
-                    cosOfcoFactorz[1] = cosOfcoFactory[0];
-                }
-            }
+            normalizeVectorLength(normOD[STAIN3], normOD[STAIN3]);
         }
     }
 
-    private void normalizeVectorLength() {
-        cosOfcoFactorx[0] = cosOfcoFactory[0] = cosOfcoFactorz[0] = 0.0;
-        double len = Math.sqrt(opticalDensitiesColour1[0] * opticalDensitiesColour1[0] +
-                opticalDensitiesColour1[1] * opticalDensitiesColour1[1] +
-                opticalDensitiesColour1[2] * opticalDensitiesColour1[2]);
-        if (len != 0.0) {
-            cosOfcoFactorx[0] = opticalDensitiesColour1[0] / len;
-            cosOfcoFactory[0] = opticalDensitiesColour1[1] / len;
-            cosOfcoFactorz[0] = opticalDensitiesColour1[2] / len;
+    /**
+     * This method determines the specified optical density for a channel when color 3 was unspecified
+     *
+     * @param doIshow boolean value that determines whether logging should be done
+     * @param channel the channel to determine the OD for
+     */
+    private void determineChannelOfColor3(boolean doIshow, int channel) {
+        if ((normOD[STAIN1][channel] * normOD[STAIN1][channel] +
+                normOD[STAIN2][channel] * normOD[STAIN2][channel]) > 1) {
+            if (doIshow)
+                IJ.log("Color_3 has a negative component in channel " + channel);
+            normOD[STAIN3][channel] = 0.0;
+        } else {
+            normOD[STAIN3][channel] = Math.sqrt(1.0 - (normOD[STAIN1][channel] * normOD[STAIN1][channel]) - (normOD[STAIN2][channel] * normOD[STAIN2][channel]));
         }
+    }
 
-        cosOfcoFactorx[1] = cosOfcoFactory[1] = cosOfcoFactorz[1] = 0.0;
-        len = Math.sqrt(opticalDensitiesColour2[0] * opticalDensitiesColour2[0] +
-                opticalDensitiesColour2[1] * opticalDensitiesColour2[1] +
-                opticalDensitiesColour2[2] * opticalDensitiesColour2[2]);
-        if (len != 0.0) {
-            cosOfcoFactorx[1] = opticalDensitiesColour2[0] / len;
-            cosOfcoFactory[1] = opticalDensitiesColour2[1] / len;
-            cosOfcoFactorz[1] = opticalDensitiesColour2[2] / len;
+    private void reset2ndStainWhenUnspecified() {
+        if (normOD[STAIN2][R] == 0.0 && normOD[STAIN2][G] == 0.0 && normOD[STAIN2][B] == 0.0) {
+            normOD[STAIN2][R] = normOD[STAIN1][B];
+            normOD[STAIN2][G] = normOD[STAIN1][R];
+            normOD[STAIN2][B] = normOD[STAIN1][G];
         }
+    }
 
-        cosOfcoFactorx[2] = cosOfcoFactory[2] = cosOfcoFactorz[2] = 0.0;
-        len = Math.sqrt(opticalDensitiesColour3[0] * opticalDensitiesColour3[0] +
-                opticalDensitiesColour3[1] * opticalDensitiesColour3[1] +
-                opticalDensitiesColour3[2] * opticalDensitiesColour3[2]);
+    /**
+     * This method normalizes the vector length of all optical density vectors.
+     *
+     * @see <a href="https://en.wikipedia.org/wiki/Unit_vector">Wikipedia definition of normalizing a vector</a>
+     */
+    private void normalizeVectorLengths() {
+        normalizeVectorLength(normOD[STAIN1], opticalDensitiesStain1);
+        normalizeVectorLength(normOD[STAIN2], opticalDensitiesStain2);
+        normalizeVectorLength(normOD[STAIN3], opticalDensitiesStain3);
+    }
+
+    /**
+     * This method normalizes the vector length of an optical density vector.
+     *
+     * @param normODColor the normalized vector of optical densities for a color
+     * @param oDColor     the vector of optical densities to normalize
+     * @see <a href="https://en.wikipedia.org/wiki/Unit_vector">Wikipedia definition of normalizing a vector</a>
+     */
+    private void normalizeVectorLength(double[] normODColor, double[] oDColor) {
+        double len = Math.sqrt(oDColor[R] * oDColor[R] + oDColor[G] * oDColor[G] + oDColor[B] * oDColor[B]);
         if (len != 0.0) {
-            cosOfcoFactorx[2] = opticalDensitiesColour3[0] / len;
-            cosOfcoFactory[2] = opticalDensitiesColour3[1] / len;
-            cosOfcoFactorz[2] = opticalDensitiesColour3[2] / len;
+            normODColor[R] = oDColor[R] / len;
+            normODColor[G] = oDColor[G] / len;
+            normODColor[B] = oDColor[B] / len;
+        } else {
+            normODColor[0] = normODColor[1] = normODColor[2] = 0.0;
         }
     }
 }
