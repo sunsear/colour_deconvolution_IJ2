@@ -10,7 +10,7 @@ public class ParseMetadata {
 
     public static void main(final String... args) throws Exception {
         ImageJ ij = new ImageJ();
-        final String filePath = "testImage.tif";
+        final String filePath = "generated.tif";
         Format format = ij.scifio().format().getFormat(filePath);
         Metadata metadata = format.createParser().parse(filePath);
         System.out.println(new FieldPrinter(metadata));

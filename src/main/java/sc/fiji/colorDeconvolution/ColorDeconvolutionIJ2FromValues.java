@@ -17,23 +17,23 @@ public class ColorDeconvolutionIJ2FromValues implements Command {
 
     @Parameter(type = INPUT, label = "Color 1 Red mean",
             description = "The mean value for Red pixels in color 1, should be between 0 and 1", max = "1", min = "0")
-    private Double r1 = 0.66645944;
+    private Double r1 = 0.5737953;
     @Parameter(type = INPUT, label = "Color 1 Green mean",
             description = "The mean value for Green pixels in color 1, should be between 0 and 1", max = "1", min = "0")
-    private Double g1 = 0.6332006;
+    private Double g1 = 0.6956962;
     @Parameter(type = INPUT, label = "Color 1 Blue mean",
             description = "The mean value for Blue pixels in color 1, should be between 0 and 1", max = "1", min = "0")
-    private Double b1 = 0.39355922;
+    private Double b1 = 0.4322119;
 
     @Parameter(type = INPUT, label = "Color 2 Red mean",
             description = "The mean value for Red pixels in color 2, should be between 0 and 1", max = "1", min = "0")
-    private Double r2 = 0.25378;
+    private Double r2 = 0.24696793;
     @Parameter(type = INPUT, label = "Color 2 Green mean",
             description = "The mean value for Green pixels in color 2, should be between 0 and 1", max = "1", min = "0")
-    private Double g2 = 0.737415;
+    private Double g2 = 0.84164965;
     @Parameter(type = INPUT, label = "Color 2 Blue mean",
             description = "The mean value for Blue pixels in color 2, should be between 0 and 1", max = "1", min = "0")
-    private Double b2 = 0.6259511;
+    private Double b2 = 0.48024228;
 
     @Parameter(type = INPUT, label = "Color 3 Red mean",
             description = "The mean value for Red pixels in color 3, should be between 0 and 1", max = "1", min = "0")
