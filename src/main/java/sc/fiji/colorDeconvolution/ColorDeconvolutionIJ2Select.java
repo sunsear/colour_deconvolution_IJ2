@@ -1,23 +1,23 @@
-package sc.fiji.colourDeconvolution;
+package sc.fiji.colorDeconvolution;
 
 import static org.scijava.ItemIO.INPUT;
 import static org.scijava.ItemIO.OUTPUT;
-import static sc.fiji.colourDeconvolution.StainParameters.Constants.ALC_B_H_DESCR;
-import static sc.fiji.colourDeconvolution.StainParameters.Constants.A_Z_DESCR;
-import static sc.fiji.colourDeconvolution.StainParameters.Constants.CMY_DESCR;
-import static sc.fiji.colourDeconvolution.StainParameters.Constants.FLG_DESCR;
-import static sc.fiji.colourDeconvolution.StainParameters.Constants.FR_FB_DAB_DESCR;
-import static sc.fiji.colourDeconvolution.StainParameters.Constants.GIEMSA_DESCR;
-import static sc.fiji.colourDeconvolution.StainParameters.Constants.H_AEC_DESCR;
-import static sc.fiji.colourDeconvolution.StainParameters.Constants.H_E2_DESCR;
-import static sc.fiji.colourDeconvolution.StainParameters.Constants.H_E_DAB_DESCR;
-import static sc.fiji.colourDeconvolution.StainParameters.Constants.H_E_DESCR;
-import static sc.fiji.colourDeconvolution.StainParameters.Constants.H_PAS_DESCR;
-import static sc.fiji.colourDeconvolution.StainParameters.Constants.MAS_TRI_DESCR;
-import static sc.fiji.colourDeconvolution.StainParameters.Constants.MG_DAB_DESCR;
-import static sc.fiji.colourDeconvolution.StainParameters.Constants.RGB_DESCR;
-import static sc.fiji.colourDeconvolution.StainParameters.H_E;
-import static sc.fiji.colourDeconvolution.StainParameters.values;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.ALC_B_H_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.A_Z_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.CMY_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.FLG_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.FR_FB_DAB_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.GIEMSA_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.H_AEC_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.H_E2_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.H_E_DAB_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.H_E_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.H_PAS_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.MAS_TRI_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.MG_DAB_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.Constants.RGB_DESCR;
+import static sc.fiji.colorDeconvolution.StainParameters.H_E;
+import static sc.fiji.colorDeconvolution.StainParameters.values;
 
 import java.util.HashMap;
 
@@ -44,18 +44,18 @@ public class ColorDeconvolutionIJ2Select implements Command {
     private String selection = H_E_DESCR;
 
     @Parameter(type = INPUT, label = "Image to color deconvolve",
-            description = "The image that you would like to apply colour deconvolution on. Should be an RGB image!")
+            description = "The image that you would like to apply color deconvolution on. Should be an RGB image!")
     private Dataset dataset;
 
     @Parameter(type = INPUT)
     private CommandService commandService;
 
-    @Parameter(type = OUTPUT, label = "Colour 1 deconvolved Image")
+    @Parameter(type = OUTPUT, label = "Color 1 deconvolved Image")
     private ImgPlus<UnsignedByteType> deconvolutedImage1;
-    @Parameter(type = OUTPUT, label = "Colour 2 deconvolved Image")
+    @Parameter(type = OUTPUT, label = "Color 2 deconvolved Image")
     private ImgPlus<UnsignedByteType> deconvolutedImage2;
     @Parameter(type = OUTPUT, label = "Remainder",
-            description = "Remainder after the other 2 colours have been subtracted. Should be close to empty")
+            description = "Remainder after the other 2 colors have been subtracted. Should be close to empty")
     private ImgPlus<UnsignedByteType> deconvolutedImage3;
 
     public ColorDeconvolutionIJ2Select() {
@@ -65,9 +65,9 @@ public class ColorDeconvolutionIJ2Select implements Command {
      * This plugin is an implementation of the color deconvolution plugin from ImageJ1
      * It converts the input image (dataset) to three deconvoluted images.
      * The parameters for the deconvolution can be selected with a dropdown. For the used values see {@link StainParameters}
-     *
+     * <p>
      * From the ImageJ 1 plugin:
-     * // This plugin implements stain separation using the colour deconvolution
+     * // This plugin implements stain separation using the color deconvolution
      * // method described in:
      * //
      * //     Ruifrok AC, Johnston DA. Quantification of histochemical
@@ -85,24 +85,24 @@ public class ColorDeconvolutionIJ2Select implements Command {
      * // new vectors and how the whole procedure works.
      * //
      * // The plugin works correctly when the background is neutral (white to light grey),
-     * // so background subtraction and colour correction must be applied to the images before
+     * // so background subtraction and color correction must be applied to the images before
      * // processing.
      * //
      * // The plugin provides a number of "built in" stain vectors some of which were determined
      * // experimentally in our lab (marked GL), but you may have to determine your own vectors to
      * // provide a more accurate stain separation, depending on the stains and methods you use.
-     * // Ideally, vector determination should be done on slides stained with only one colour
+     * // Ideally, vector determination should be done on slides stained with only one color
      * // at a time (using the "From ROI" interactive option).
      * //
      * // The plugin takes an RGB image and returns three 8-bit images. If the specimen is
-     * // stained with a 2 colour scheme (such as H & E) the 3rd image represents the
-     * // complimentary of the first two colours (i.e. green).
+     * // stained with a 2 color scheme (such as H & E) the 3rd image represents the
+     * // complimentary of the first two colors (i.e. green).
      * //
-     * // Please be *very* careful about how to interpret the results of colour deconvolution
+     * // Please be *very* careful about how to interpret the results of color deconvolution
      * // when analysing histological images.
      * // Most staining methods are not stochiometric and so optical density of the chromogen
      * // may not correlate well with the *quantity* of the reactants.
-     * // This means that optical density of the colour may not be a good indicator of
+     * // This means that optical density of the color may not be a good indicator of
      * // the amount of material stained.
      * //
      * // Read the paper!

@@ -1,4 +1,4 @@
-package sc.fiji.colourDeconvolution;
+package sc.fiji.colorDeconvolution;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -21,14 +21,14 @@ import net.imglib2.type.numeric.integer.UnsignedByteType;
 public class StainMatrixIJ2Test {
 
     @Test
-    public void testColourDeconvolutionFor3PrimalColours() throws IOException {
+    public void testColorDeconvolutionFor3PrimalColors() throws IOException {
         ImageJ ij = new ImageJ();
         DatasetIOService datasetIOService = ij.scifio().datasetIO();
         Dataset dataset = datasetIOService.open("src/test/resources/primal.tif");
         @SuppressWarnings("unchecked")
         ImgPlus<UnsignedByteType> imagePlus = (ImgPlus<UnsignedByteType>) dataset.getImgPlus();
         StainMatrixIJ2 stainMatrix = new StainMatrixIJ2();
-        stainMatrix.init("Primal colours", -4.9944286E-4, 0.7071067, 0.7071067, 0.7071067, -4.9944286E-4, 0.7071067, 0.7071067, 0.7071067, -4.9944286E-4);
+        stainMatrix.init("Primal colors", -4.9944286E-4, 0.7071067, 0.7071067, 0.7071067, -4.9944286E-4, 0.7071067, 0.7071067, 0.7071067, -4.9944286E-4);
 
         Instant start = Instant.now();
         ImgPlus<UnsignedByteType>[] computed = stainMatrix.compute(imagePlus);
@@ -38,17 +38,17 @@ public class StainMatrixIJ2Test {
         datasetIOService.save(new DefaultDataset(datasetIOService.context(), computed[0]), "target/ij2-outputPrimalColour1.tif");
         datasetIOService.save(new DefaultDataset(datasetIOService.context(), computed[1]), "target/ij2-outputPrimalColour2.tif");
         datasetIOService.save(new DefaultDataset(datasetIOService.context(), computed[2]), "target/ij2-outputPrimalColour3.tif");
-        ImagePlus expected1 = new ImagePlus("src/test/resources/expectedPrimalColour1.tif");
+        ImagePlus expected1 = new ImagePlus("src/test/resources/expectedPrimalColor1.tif");
         new ImageCalculator().run("Difference", expected1, new ImagePlus("target/ij2-outputPrimalColour1.tif"));
         assertArrayEquals("Difference between 2 images should be 0 at every point.",
                 new byte[40 * 40], (byte[]) expected1.getImageStack().getPixels(1));
     }
 
     @Test
-    public void testColourDeconvolutionFor2Colours() throws IOException {
+    public void testColorDeconvolutionFor2Colors() throws IOException {
         ImageJ ij = new ImageJ();
         DatasetIOService datasetIOService = ij.scifio().datasetIO();
-        Dataset dataset = datasetIOService.open("src/test/resources/2ColourImage.tif");
+        Dataset dataset = datasetIOService.open("src/test/resources/2ColorImage.tif");
         @SuppressWarnings("unchecked")
         ImgPlus<UnsignedByteType> imagePlus = (ImgPlus<UnsignedByteType>) dataset.getImgPlus();
         StainMatrixIJ2 stainMatrix = new StainMatrixIJ2();
@@ -69,10 +69,10 @@ public class StainMatrixIJ2Test {
     }
 
     @Test
-    public void testColourDeconvolutionOnSmallImage() throws IOException {
+    public void testColorDeconvolutionOnSmallImage() throws IOException {
         ImageJ ij = new ImageJ();
         DatasetIOService datasetIOService = ij.scifio().datasetIO();
-        Dataset dataset = datasetIOService.open("src/test/resources/small2ColourImage.tif");
+        Dataset dataset = datasetIOService.open("src/test/resources/small2ColorImage.tif");
         @SuppressWarnings("unchecked")
         ImgPlus<UnsignedByteType> imagePlus = (ImgPlus<UnsignedByteType>) dataset.getImgPlus();
         StainMatrixIJ2 stainMatrix = new StainMatrixIJ2();
@@ -102,9 +102,9 @@ public class StainMatrixIJ2Test {
      * lookup still does what the original calculation intended.
      */
     @Test
-    public void testLogifyLookupPerformsAsComputation() {
+    public void testAbsorptionLookupPerformsAsComputation() {
         for (int i = 0; i < 256; i++) {
-            assertEquals(-((255.0 * Math.log((i + 1) / 255.0)) / StainMatrixIJ2.LOG_255), StainMatrixIJ2.logify(i), 0.00001);
+            assertEquals(-((255.0 * Math.log((i + 1) / 255.0)) / Math.log(255.0)), StainMatrixIJ2.convertIntensityToAbsorption(i), 0.00001);
         }
     }
 }
