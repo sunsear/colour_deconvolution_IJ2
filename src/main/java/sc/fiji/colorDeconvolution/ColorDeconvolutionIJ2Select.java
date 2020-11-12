@@ -71,8 +71,8 @@ public class ColorDeconvolutionIJ2Select implements Command {
      * // method described in:
      * //
      * //     Ruifrok AC, Johnston DA. Quantification of histochemical
-     * //     staining by color deconvolution. Analytical & Quantitative
-     * //     Cytology & Histology 2001; 23: 291-299.
+     * //     staining by color deconvolution. Analytical &amp; Quantitative
+     * //     Cytology &amp; Histology 2001; 23: 291-299.
      * //
      * // The code is based on "Color separation-30", a macro for NIH Image kindly provided
      * // by A.C. Ruifrok. Thanks Arnout!
@@ -95,7 +95,7 @@ public class ColorDeconvolutionIJ2Select implements Command {
      * // at a time (using the "From ROI" interactive option).
      * //
      * // The plugin takes an RGB image and returns three 8-bit images. If the specimen is
-     * // stained with a 2 color scheme (such as H & E) the 3rd image represents the
+     * // stained with a 2 color scheme (such as H &amp; E) the 3rd image represents the
      * // complimentary of the first two colors (i.e. green).
      * //
      * // Please be *very* careful about how to interpret the results of color deconvolution
