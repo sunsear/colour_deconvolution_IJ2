@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
 		<version>27.0.1</version>
-		<relativePath/>
+		<relativePath />
 	</parent>
 
 	<groupId>com.github.sunsear</groupId>
 	<artifactId>Color_Deconvolution_IJ2</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
 	<name>Color Deconvolution for ImageJ2</name>
@@ -79,7 +78,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/sunsear/colour_deconvolution_IJ2</connection>
 		<developerConnection>scm:git:git@github.com:sunsear/colour_deconvolution_IJ2</developerConnection>
-		<tag>HEAD</tag>
+		<tag>Color_Deconvolution_IJ2-1.0.0</tag>
 		<url>https://github.com/sunsear/colour_deconvolution_IJ2</url>
 	</scm>
 	<issueManagement>
