@@ -13,6 +13,7 @@
 	<groupId>com.github.sunsear</groupId>
 	<artifactId>Color_Deconvolution_IJ2</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 
 	<name>Color Deconvolution for ImageJ2</name>
 	<description>Color Deconvolution plugin for ImageJ2 and related projects such as Knime.</description>
