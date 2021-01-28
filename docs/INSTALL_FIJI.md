@@ -1,4 +1,4 @@
-##Installing this plugin into FIJI
+## Installing this plugin into FIJI
 
 After downloading the plugin from maven, open up FIJI. 
 1.  Navigate to the Plugin menu and click "Install...".
