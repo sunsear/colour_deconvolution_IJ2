@@ -39,8 +39,9 @@ This plugin works for single images at this point, [not yet for image stacks](ht
 
 ##Installing the plugin
 
-Download the latest version of the plugin from Maven central:
- 
-https://search.maven.org/search?q=g:com.github.sunsear%20AND%20a:Color_Deconvolution_IJ2
+1. [Download the plugin](DOWNLOAD_PLUGIN.md). 
 
-Click the download link and download the jar file. Install this into [Fiji](docs/INSTALL_FIJI.md) or Knime in the appropriate way, good to go!
+2. Next choose where you want to use the plugin. Install this into: 
+    * [Fiji](docs/INSTALL_FIJI.md) and/or 
+    * [Knime](docs/INSTALL_KNIME.md) 
+3. Good to go!
