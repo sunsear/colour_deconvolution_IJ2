@@ -12,3 +12,5 @@ After [downloading the plugin from maven](DOWNLOAD_PLUGIN.md), open up FIJI.
 * You should now have the plugin in the color menu:
 
 ![Plugin active](img/fiji_install_success.png)  
+
+### Enjoy!

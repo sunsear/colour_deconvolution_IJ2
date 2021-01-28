@@ -33,13 +33,13 @@ This plugin is an adaptation of Gabriels work and also implements the method des
 
 Ruifrok, A.C. & Johnston, D.A. (2001), ["Quantification of histochemical staining by color deconvolution"](http://www.ncbi.nlm.nih.gov/pubmed/11531144), Anal. Quant. Cytol. Histol. 23: 291-299, PMID 11531144
 
-##Constraints
+## Constraints
 
 This plugin works for single images at this point, [not yet for image stacks](https://github.com/sunsear/colour_deconvolution_IJ2/issues/6). Working with multiple images is recommended to be done [using the Knime workflow we have created](https://hub.knime.com/boudewijn/spaces/Public/latest/HistogramOfDeconvolutedImagesWithOriginal).
 
-##Installing the plugin
+## Installing the plugin
 
-1. [Download the plugin](DOWNLOAD_PLUGIN.md). 
+1. [Download the plugin](docs/DOWNLOAD_PLUGIN.md). 
 
 2. Next choose where you want to use the plugin. Install this into: 
     * [Fiji](docs/INSTALL_FIJI.md) and/or 
